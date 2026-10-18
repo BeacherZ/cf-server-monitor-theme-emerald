@@ -359,31 +359,32 @@ export function formatPrice(price: number, currency: string = '￥', lang: 'zh-C
   return `${symbol}${numericPrice}`
 }
 
-function getBillingCycleShortText(billingCycle: number): string {
+/** 计费周期短文本：zh-CN 用中文单位（年/季/月/天），en-US 用字母缩写（Y/Q/M/D） */
+function getBillingCycleShortText(billingCycle: number, lang: 'zh-CN' | 'en-US' = 'zh-CN'): string {
+  const zh = lang === 'zh-CN'
+  const unit = (count: number, zhUnit: string, enUnit: string) =>
+    count === 1 ? (zh ? zhUnit : enUnit) : `${count}${zh ? zhUnit : enUnit}`
+
   const days = Number(billingCycle)
   if (days === -1 || days <= 0 || !Number.isFinite(days))
-    return 'once'
+    return zh ? '一次性' : 'once'
   if (days === 90)
-    return 'Q'
+    return zh ? '季' : 'Q'
   if (days === 180)
-    return '6M'
-  if (days > 0 && days % 365 === 0) {
-    const years = days / 365
-    return years === 1 ? 'Y' : `${years}Y`
-  }
-  if (days > 0 && days % 30 === 0) {
-    const months = days / 30
-    return months === 1 ? 'M' : `${months}M`
-  }
+    return zh ? '半年' : '6M'
+  if (days > 0 && days % 365 === 0)
+    return unit(days / 365, '年', 'Y')
+  if (days > 0 && days % 30 === 0)
+    return unit(days / 30, '月', 'M')
   if (days >= 360)
-    return 'Y'
+    return zh ? '年' : 'Y'
   if (days >= 175)
-    return '6M'
+    return zh ? '半年' : '6M'
   if (days >= 87)
-    return 'Q'
+    return zh ? '季' : 'Q'
   if (days >= 27)
-    return 'M'
-  return `${days}D`
+    return zh ? '月' : 'M'
+  return `${days}${zh ? '天' : 'D'}`
 }
 
 /**
@@ -401,7 +402,7 @@ export function formatPriceWithCycle(
   lang: 'zh-CN' | 'en-US' = 'zh-CN',
 ): string {
   const priceText = formatPrice(price, currency, lang)
-  const cycleText = getBillingCycleShortText(billingCycle)
+  const cycleText = getBillingCycleShortText(billingCycle, lang)
   return Number(price) > 0 ? `${priceText}/${cycleText}` : priceText
 }
 
