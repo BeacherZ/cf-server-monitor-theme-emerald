@@ -2,6 +2,7 @@ import type { MaybeRefOrGetter } from 'vue'
 import type { NodeStatusPing } from '@/utils/rpc'
 import { computed, toValue } from 'vue'
 import { NODE_PING_BAR_COUNT, useNodePingStats } from '@/composables/useNodePingStats'
+import { useNodesStore } from '@/stores/nodes'
 import { formatDateTime } from '@/utils/helper'
 import { getPingToneClass, PING_PROVIDERS } from '@/utils/nodeHelper'
 
@@ -95,24 +96,32 @@ export function useNodePingDisplay(
     enabled: pingStatsEnabled,
   })
 
+  const nodesStore = useNodesStore()
+
   /**
-   * 将一小时数据集按时间平均划分为 NODE_PING_BAR_COUNT 根柱子，
-   * 每根柱取段内数据点的平均值（无论段内几条数据）。
+   * 把历史按固定的 NODE_PING_BAR_COUNT 个时间格铺满整个窗口（默认 1 小时），
+   * 以最后一个采样点为锚点向左切分。格数恒定，不随采样点数量变化；
+   * 尚无数据的格子显示为浅灰占位，随时间自然被填充。
    */
   function buildPingBars(metric: NodePingMetric): NodePingBar[] {
     const points = pingStats.history.value
     if (!points.length)
       return []
 
-    const barCount = Math.min(NODE_PING_BAR_COUNT, points.length)
-    const firstTime = Date.parse(points[0]!.time)
+    const barCount = NODE_PING_BAR_COUNT
+    const spanMs = nodesStore.pingHistorySpanMs
+    const slotMs = Math.max(1, Math.round(spanMs / barCount))
     const lastTime = Date.parse(points.at(-1)!.time)
-    const segmentSize = Math.max(1, (lastTime - firstTime) / barCount)
+    if (!Number.isFinite(lastTime))
+      return []
+
+    const endTime = lastTime + slotMs
+    const startTime = endTime - spanMs
 
     const bars: NodePingBar[] = []
     for (let index = 0; index < barCount; index++) {
-      const segmentStart = firstTime + index * segmentSize
-      const segmentEnd = index === barCount - 1 ? lastTime + 1 : segmentStart + segmentSize
+      const segmentStart = startTime + index * slotMs
+      const segmentEnd = segmentStart + slotMs
       const segmentPoints = points.filter((point) => {
         const time = Date.parse(point.time)
         return time >= segmentStart && time < segmentEnd
@@ -142,10 +151,10 @@ export function useNodePingDisplay(
             ? getLatencyToneClass(value)
             : getLossToneClass(value),
         tooltip: value === null
-          ? `${formatDateTime(segmentTime, 'HH:mm:ss')} N/A`
+          ? `${formatDateTime(segmentTime, 'HH:mm')}–${formatDateTime(new Date(segmentEnd).toISOString(), 'HH:mm')}\n无数据`
           : metric === 'latency'
-            ? `${formatDateTime(segmentTime, 'HH:mm:ss')}\n${Math.round(value)} ms`
-            : `${formatDateTime(segmentTime, 'HH:mm:ss')}\n${value.toFixed(1)}%`,
+            ? `${formatDateTime(segmentTime, 'HH:mm')}\n${Math.round(value)} ms`
+            : `${formatDateTime(segmentTime, 'HH:mm')}\n${value.toFixed(1)}%`,
       })
     }
 

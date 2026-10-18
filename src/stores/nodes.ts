@@ -301,6 +301,12 @@ const useNodesStore = defineStore('nodes', () => {
     return Math.max(1, Math.round(hours * 3_600_000 / points))
   }
 
+  /** 当前配置下的历史窗口总时长（毫秒），用于把小方格的固定 10 格铺满同一时间跨度 */
+  const pingHistorySpanMs = computed(() => {
+    const { hours } = pingHistoryConfig.value
+    return Math.max(1, Math.round(hours * 3_600_000))
+  })
+
   /**
    * 按后端配置调整 ping 历史摄取策略：showThreeNetDetails 决定是否消费窗口，points/hours 决定桶长与保留条数。
    * 缺省字段保持默认值（兼容旧后端）。
@@ -583,6 +589,7 @@ const useNodesStore = defineStore('nodes', () => {
     groups,
     nodesByUuid,
     showThreeNetDetails,
+    pingHistorySpanMs,
     // 方法
     initNodes,
     updateNodeStatuses,
