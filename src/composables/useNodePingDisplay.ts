@@ -15,6 +15,8 @@ export interface NodePingBar {
 
 interface UseNodePingDisplayOptions {
   enabled?: MaybeRefOrGetter<boolean>
+  /** 本机当前生效的 ping 目标数，用于在 tooltip 标注平均口径 */
+  targetCount?: MaybeRefOrGetter<number>
   loadingDisplayText?: string
   emptyDisplayText?: string
   loadingPanelTooltipText?: Partial<Record<NodePingMetric, string>>
@@ -189,13 +191,21 @@ export function useNodePingDisplay(
     return options.emptyDisplayText ?? '-'
   })
 
+  // tooltip 后缀：标明本次平均用了几条 ping 线路
+  const targetCountSuffix = computed(() => {
+    if (options.targetCount === undefined)
+      return ''
+    const count = toValue(options.targetCount)
+    return count > 1 ? ` · ${count} 个目标` : ''
+  })
+
   const latencyPanelTooltip = computed(() => {
     if (!pingStats.hasData.value) {
       if (pingStats.loading.value)
         return options.loadingPanelTooltipText?.latency ?? ''
       return options.emptyPanelTooltipText?.latency ?? ''
     }
-    return `平均延迟 ${Math.round(pingStats.avgLatency.value)} ms`
+    return `平均延迟 ${Math.round(pingStats.avgLatency.value)} ms${targetCountSuffix.value}`
   })
 
   const lossPanelTooltip = computed(() => {
@@ -208,7 +218,7 @@ export function useNodePingDisplay(
     const volatility = pingStats.avgVolatility.value > 0
       ? `，平均波动 ${pingStats.avgVolatility.value.toFixed(2)}`
       : ''
-    return `平均丢包 ${pingStats.avgLoss.value.toFixed(1)}%${volatility}`
+    return `平均丢包 ${pingStats.avgLoss.value.toFixed(1)}%${volatility}${targetCountSuffix.value}`
   })
 
   return {
