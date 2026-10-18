@@ -89,15 +89,43 @@ function pauseHide() {
   clearHideTimers()
 }
 
-// 悬停或展开时不打断阅读，离开后重新计 8 秒
-watch([expand, isHovering], ([expanded, hovering]) => {
+/**
+ * 只有真实鼠标悬停才暂停计时。
+ * 展开状态本身**不**暂停——鼠标移开后 8 秒照样淡出（否则展开后卡片永不消失）。
+ * 触摸设备不参与悬停判定：移动端点击会合成一次 mouseenter 却永远没有 mouseleave，
+ * 一旦计入就会把卡片永久钉住（移动端展开后不消失的根因）。
+ */
+watch(isHovering, (hovering) => {
   if (cardLeaving.value || cardRemoved.value)
     return
-  if (expanded || hovering)
+  if (hovering)
     pauseHide()
   else
     scheduleHide()
 })
+
+function handlePointerEnter(event: PointerEvent) {
+  if (event.pointerType === 'touch')
+    return
+  isHovering.value = true
+}
+
+function handlePointerLeave(event: PointerEvent) {
+  if (event.pointerType === 'touch')
+    return
+  isHovering.value = false
+}
+
+/** 点击展开/收起后重新计 8 秒；若鼠标仍悬停则维持暂停 */
+function handleCardClick() {
+  if (cardLeaving.value || cardRemoved.value)
+    return
+  expand.value = !expand.value
+  if (isHovering.value)
+    pauseHide()
+  else
+    scheduleHide()
+}
 
 onBeforeUnmount(clearHideTimers)
 
@@ -467,9 +495,9 @@ onMounted(async () => {
           ? 'rounded-lg -translate-y-1 bg-background/38 shadow-[-1px_-1px_0_background,0_10px_28px_rgba(0,0,0,0.08)]'
           : 'rounded-xl',
       ]"
-      @click="expand = !expand"
-      @mouseenter="isHovering = true"
-      @mouseleave="isHovering = false"
+      @click="handleCardClick"
+      @pointerenter="handlePointerEnter"
+      @pointerleave="handlePointerLeave"
     >
       <TransitionGroup
         tag="div"
