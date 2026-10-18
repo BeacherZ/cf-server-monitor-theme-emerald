@@ -48,13 +48,6 @@ const priceTags = computed(() => getPriceTags(props.node, appStore.lang, canView
 const remainingTimeTagClass = computed(() => getRemainingTimeTagClass(props.node))
 const customTags = computed(() => getCustomTags(props.node))
 
-// 本机当前有响应的 ping 目标数，用于 tooltip 标注平均口径
-const pingTargetCount = computed(() =>
-  Object.values(props.node.ping ?? {})
-    .filter(entry => Number.isFinite(entry.latest) && (entry.latest ?? 0) > 0)
-    .length,
-)
-
 const {
   latencyRenderBars,
   lossRenderBars,
@@ -62,7 +55,7 @@ const {
   lossDisplay,
   latencyPanelTooltip,
   lossPanelTooltip,
-} = useNodePingDisplay(props.node.uuid, { targetCount: pingTargetCount })
+} = useNodePingDisplay(props.node.uuid)
 const topPingNetworks = computed(() => buildTopPingNetworks(props.node.ping))
 
 function openPingDialog() {

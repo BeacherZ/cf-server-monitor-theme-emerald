@@ -124,9 +124,6 @@ const PING_HISTORY_DEFAULTS: PingHistoryConfig = {
   hours: 1,
 }
 
-/** 后端 latency_window 只携带 ct/cu/cm/bd 四个目标，超过该数量时窗口无法覆盖全部启用目标 */
-const PING_WINDOW_KEY_COUNT = 4
-
 const useNodesStore = defineStore('nodes', () => {
   // ===== 状态 =====
   const nodes = ref<NodeData[]>([])
@@ -301,12 +298,6 @@ const useNodesStore = defineStore('nodes', () => {
     return Math.max(1, Math.round(hours * 3_600_000 / points))
   }
 
-  /** 当前配置下的历史窗口总时长（毫秒），用于把小方格的固定 10 格铺满同一时间跨度 */
-  const pingHistorySpanMs = computed(() => {
-    const { hours } = pingHistoryConfig.value
-    return Math.max(1, Math.round(hours * 3_600_000))
-  })
-
   /**
    * 按后端配置调整 ping 历史摄取策略：showThreeNetDetails 决定是否消费窗口，points/hours 决定桶长与保留条数。
    * 缺省字段保持默认值（兼容旧后端）。
@@ -334,18 +325,11 @@ const useNodesStore = defineStore('nodes', () => {
     if (!Number.isFinite(sampleTime))
       return
 
-    // 只统计本机真正在探测的 ping 目标：有有效延迟值即视为启用。
-    // 未填写的占位槽位（Node 3 / Node 4）与"该机没有 V6"的目标只有 false，
-    // 但它们的 loss 常为 0，直接并入平均会把丢包率稀释，故排除。
-    // 线路真的挂掉时后端会返回 loss=100，仍会被计入，故障不会被隐藏。
     const pingEntries = Object.values(status.ping ?? {})
-    const hasLatency = (entry: typeof pingEntries[number]): boolean =>
-      Number.isFinite(entry.latest) && (entry.latest ?? 0) > 0
     const latencyValues = pingEntries
-      .filter(hasLatency)
-      .map(entry => entry.latest as number)
+      .map(entry => entry.latest)
+      .filter(value => Number.isFinite(value) && value > 0)
     const lossValues = pingEntries
-      .filter(entry => hasLatency(entry) || (Number.isFinite(entry.loss) && (entry.loss ?? 0) > 0))
       .map(entry => entry.loss)
       .filter(value => Number.isFinite(value) && value >= 0)
 
@@ -430,15 +414,9 @@ const useNodesStore = defineStore('nodes', () => {
       }
 
       if (status) {
-        // 开关开启且后端返回窗口时可直接作为历史（已含最新桶）。
-        // 但窗口只带 ct/cu/cm/bd 四个目标：本机启用的 ping 目标多于 4 个时（如带 V6 的机器），
-        // 用窗口会漏掉 node_1..node_4，与卡片"全部目标平均"口径不一致，
-        // 此时改为实时样本累积，确保分母等于本机实际启用的目标数。
-        const activeTargets = Object.values(status.ping ?? {})
-          .filter(entry => Number.isFinite(entry.latest) && (entry.latest ?? 0) > 0)
-          .length
-        const windowCoversAllTargets = activeTargets <= PING_WINDOW_KEY_COUNT
-        if (pingHistoryConfig.value.showThreeNetDetails && status.pingWindow?.length && windowCoversAllTargets) {
+        // 开关开启且后端返回窗口时直接作为历史（已含最新桶），
+        // 否则（开关关闭 / 窗口缺失）由实时样本按单条 ping 值逐步累积
+        if (pingHistoryConfig.value.showThreeNetDetails && status.pingWindow?.length) {
           pingHistoryByUuid.value = {
             ...pingHistoryByUuid.value,
             [uuid]: status.pingWindow.slice(-pingHistoryConfig.value.points),
@@ -589,7 +567,6 @@ const useNodesStore = defineStore('nodes', () => {
     groups,
     nodesByUuid,
     showThreeNetDetails,
-    pingHistorySpanMs,
     // 方法
     initNodes,
     updateNodeStatuses,

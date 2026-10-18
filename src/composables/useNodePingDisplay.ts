@@ -2,7 +2,6 @@ import type { MaybeRefOrGetter } from 'vue'
 import type { NodeStatusPing } from '@/utils/rpc'
 import { computed, toValue } from 'vue'
 import { NODE_PING_BAR_COUNT, useNodePingStats } from '@/composables/useNodePingStats'
-import { useNodesStore } from '@/stores/nodes'
 import { formatDateTime } from '@/utils/helper'
 import { getPingToneClass, PING_PROVIDERS } from '@/utils/nodeHelper'
 
@@ -16,8 +15,6 @@ export interface NodePingBar {
 
 interface UseNodePingDisplayOptions {
   enabled?: MaybeRefOrGetter<boolean>
-  /** 本机当前生效的 ping 目标数，用于在 tooltip 标注平均口径 */
-  targetCount?: MaybeRefOrGetter<number>
   loadingDisplayText?: string
   emptyDisplayText?: string
   loadingPanelTooltipText?: Partial<Record<NodePingMetric, string>>
@@ -96,32 +93,24 @@ export function useNodePingDisplay(
     enabled: pingStatsEnabled,
   })
 
-  const nodesStore = useNodesStore()
-
   /**
-   * 把历史按固定的 NODE_PING_BAR_COUNT 个时间格铺满整个窗口（默认 1 小时），
-   * 以最后一个采样点为锚点向左切分。格数恒定，不随采样点数量变化；
-   * 尚无数据的格子显示为浅灰占位，随时间自然被填充。
+   * 将一小时数据集按时间平均划分为 NODE_PING_BAR_COUNT 根柱子，
+   * 每根柱取段内数据点的平均值（无论段内几条数据）。
    */
   function buildPingBars(metric: NodePingMetric): NodePingBar[] {
     const points = pingStats.history.value
     if (!points.length)
       return []
 
-    const barCount = NODE_PING_BAR_COUNT
-    const spanMs = nodesStore.pingHistorySpanMs
-    const slotMs = Math.max(1, Math.round(spanMs / barCount))
+    const barCount = Math.min(NODE_PING_BAR_COUNT, points.length)
+    const firstTime = Date.parse(points[0]!.time)
     const lastTime = Date.parse(points.at(-1)!.time)
-    if (!Number.isFinite(lastTime))
-      return []
-
-    const endTime = lastTime + slotMs
-    const startTime = endTime - spanMs
+    const segmentSize = Math.max(1, (lastTime - firstTime) / barCount)
 
     const bars: NodePingBar[] = []
     for (let index = 0; index < barCount; index++) {
-      const segmentStart = startTime + index * slotMs
-      const segmentEnd = segmentStart + slotMs
+      const segmentStart = firstTime + index * segmentSize
+      const segmentEnd = index === barCount - 1 ? lastTime + 1 : segmentStart + segmentSize
       const segmentPoints = points.filter((point) => {
         const time = Date.parse(point.time)
         return time >= segmentStart && time < segmentEnd
@@ -151,10 +140,10 @@ export function useNodePingDisplay(
             ? getLatencyToneClass(value)
             : getLossToneClass(value),
         tooltip: value === null
-          ? `${formatDateTime(segmentTime, 'HH:mm')}–${formatDateTime(new Date(segmentEnd).toISOString(), 'HH:mm')}\n无数据`
+          ? `${formatDateTime(segmentTime, 'HH:mm:ss')} N/A`
           : metric === 'latency'
-            ? `${formatDateTime(segmentTime, 'HH:mm')}\n${Math.round(value)} ms`
-            : `${formatDateTime(segmentTime, 'HH:mm')}\n${value.toFixed(1)}%`,
+            ? `${formatDateTime(segmentTime, 'HH:mm:ss')}\n${Math.round(value)} ms`
+            : `${formatDateTime(segmentTime, 'HH:mm:ss')}\n${value.toFixed(1)}%`,
       })
     }
 
@@ -200,21 +189,13 @@ export function useNodePingDisplay(
     return options.emptyDisplayText ?? '-'
   })
 
-  // tooltip 后缀：标明本次平均用了几条 ping 线路
-  const targetCountSuffix = computed(() => {
-    if (options.targetCount === undefined)
-      return ''
-    const count = toValue(options.targetCount)
-    return count > 1 ? ` · ${count} 个目标` : ''
-  })
-
   const latencyPanelTooltip = computed(() => {
     if (!pingStats.hasData.value) {
       if (pingStats.loading.value)
         return options.loadingPanelTooltipText?.latency ?? ''
       return options.emptyPanelTooltipText?.latency ?? ''
     }
-    return `平均延迟 ${Math.round(pingStats.avgLatency.value)} ms${targetCountSuffix.value}`
+    return `平均延迟 ${Math.round(pingStats.avgLatency.value)} ms`
   })
 
   const lossPanelTooltip = computed(() => {
@@ -227,7 +208,7 @@ export function useNodePingDisplay(
     const volatility = pingStats.avgVolatility.value > 0
       ? `，平均波动 ${pingStats.avgVolatility.value.toFixed(2)}`
       : ''
-    return `平均丢包 ${pingStats.avgLoss.value.toFixed(1)}%${volatility}${targetCountSuffix.value}`
+    return `平均丢包 ${pingStats.avgLoss.value.toFixed(1)}%${volatility}`
   })
 
   return {
