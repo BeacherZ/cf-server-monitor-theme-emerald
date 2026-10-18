@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useAppStore } from '@/stores/app'
 import { getApiAssetUrl } from '@/utils/api'
 
@@ -49,6 +49,60 @@ const countryCode = ref('')
 const visitTime = ref(formatVisitTime(new Date()))
 const flagVisible = ref(true)
 const expand = ref(false)
+
+// 访客卡片出现后自动淡出隐藏：数据就绪 → 延迟 1s 淡入 → 展示 8s → 1s 淡出后移除
+const APPEAR_DELAY_MS = 1000
+const VISIBLE_MS = 8000
+const FADE_MS = 1000
+
+const cardVisible = ref(false)
+const cardLeaving = ref(false)
+const cardRemoved = ref(false)
+const isHovering = ref(false)
+let hideTimer: number | null = null
+let removeTimer: number | null = null
+
+function clearHideTimers() {
+  if (hideTimer !== null) {
+    window.clearTimeout(hideTimer)
+    hideTimer = null
+  }
+  if (removeTimer !== null) {
+    window.clearTimeout(removeTimer)
+    removeTimer = null
+  }
+}
+
+function scheduleHide() {
+  clearHideTimers()
+  hideTimer = window.setTimeout(() => {
+    hideTimer = null
+    cardLeaving.value = true
+    removeTimer = window.setTimeout(() => {
+      removeTimer = null
+      cardRemoved.value = true
+    }, FADE_MS)
+  }, VISIBLE_MS)
+}
+
+function pauseHide() {
+  if (!cardVisible.value || cardLeaving.value || cardRemoved.value)
+    return
+  clearHideTimers()
+}
+
+// 悬停或展开时不打断阅读，离开后重新计 8 秒
+watch([expand, isHovering], ([expanded, hovering]) => {
+  if (!cardVisible.value || cardLeaving.value || cardRemoved.value)
+    return
+  if (expanded || hovering)
+    pauseHide()
+  else
+    scheduleHide()
+})
+
+onBeforeUnmount(clearHideTimers)
+
 
 const subtitle = computed(() => loading.value ? '检测中' : location.value || '网络访客')
 const flagSrc = computed(() => countryCode.value ? getApiAssetUrl(`flags/${countryCode.value.toLowerCase()}.svg`) : '')
@@ -395,19 +449,31 @@ onMounted(async () => {
   }
 
   loading.value = false
+
+  // 数据就绪后再等 1 秒才淡入，避免"骨架屏 + 内容"两次跳变
+  await new Promise(resolve => window.setTimeout(resolve, APPEAR_DELAY_MS))
+  cardVisible.value = true
+  scheduleHide()
 })
 </script>
 
 <template>
-  <div class="pointer-events-none fixed inset-x-0 bottom-2.5 z-30 flex justify-center">
+  <div
+    v-if="!cardRemoved"
+    class="visitor-card-fade pointer-events-none fixed inset-x-0 bottom-2.5 z-30 flex justify-center transition-[opacity,transform] duration-1000 ease-out"
+    :class="cardVisible && !cardLeaving ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'"
+  >
     <div
-      class="pointer-events-auto cursor-default p-1.5 px-3 shadow-[-1px_-1px_0_background,0_0_16px_rgba(0,0,0,0.05)] transition-[border-radius,transform,background-color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] bg-background/30 backdrop-blur-sm"
+      class="cursor-default p-1.5 px-3 shadow-[-1px_-1px_0_background,0_0_16px_rgba(0,0,0,0.05)] transition-[border-radius,transform,background-color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] bg-background/30 backdrop-blur-sm"
       :class="[
+        cardVisible && !cardLeaving ? 'pointer-events-auto' : 'pointer-events-none',
         expand
           ? 'rounded-lg -translate-y-1 bg-background/38 shadow-[-1px_-1px_0_background,0_10px_28px_rgba(0,0,0,0.08)]'
           : 'rounded-xl',
       ]"
       @click="expand = !expand"
+      @mouseenter="isHovering = true"
+      @mouseleave="isHovering = false"
     >
       <TransitionGroup
         tag="div"
@@ -446,6 +512,12 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+@media (prefers-reduced-motion: reduce) {
+  .visitor-card-fade {
+    transition: none !important;
+  }
+}
+
 .visitor-pill-enter-active,
 .visitor-pill-leave-active,
 .visitor-pill-move {
