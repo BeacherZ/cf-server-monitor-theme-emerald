@@ -44,9 +44,8 @@ bash scripts/publish-build.sh   # 推到 build 分支，并打印新地址
 ### 5. 本仓库相对上游改了什么
 
 - 改动 1：`src/components/NodeEarthGlobe.vue` 移除了自转地球上的蓝色连线弧（cobe 的 `arcs`），其余地球表现与上游 v1.2.10 一致。
-- 改动 2：`src/components/Footer.vue` 的「Theme by Emerald」署名链接改为指向本仓库（官方 `Powered by CF Server Monitor` 署名与链接按规范保留）。
-- 改动 3：`src/components/VisitorInfoCard.vue` 访客信息条改为自动隐藏 —— 数据就绪后直接显示（无淡入），展示 8 秒后 1 秒淡出并从页面移除；鼠标悬停或点开详情时暂停计时，离开后重新计 8 秒。
-- 改动 4：`src/utils/tagHelper.ts` 卡片价格行的计费周期跟随语言显示中文 —— `Y→年`、`M→月`、`Q→季`、`D→天`（英文界面仍为 `Y/M/Q/D`）。
+- 改动 2：`src/components/VisitorInfoCard.vue` 访客信息条改为自动隐藏 —— 数据就绪后直接显示（无淡入），展示 8 秒后 1 秒淡出并从页面移除；鼠标悬停或点开详情时暂停计时，离开后重新计 8 秒。
+- 改动 3：`src/utils/tagHelper.ts` 卡片价格行的计费周期跟随语言显示中文 —— `Y→年`、`M→月`、`Q→季`、`D→天`（英文界面仍为 `Y/M/Q/D`）。
 
 ---
 
