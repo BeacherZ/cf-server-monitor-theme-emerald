@@ -10,7 +10,6 @@ const appStore = useAppStore()
 const api = getSharedApi()
 
 const buildVersion = __BUILD_VERSION__
-const buildGitHash = __BUILD_GIT_HASH__
 
 const serverVersion = ref<VersionInfo | null>(null)
 
@@ -54,7 +53,7 @@ const showFiling = computed(() => showIcp.value || showPolice.value)
         <DataTooltip
           as="span"
           placement="top"
-          :content="`v${buildVersion}\n${buildGitHash}`"
+          :content="`v${buildVersion}`"
         >
           <a
             href="https://github.com/BeacherZ/cf-server-monitor-theme-emerald" target="_blank" rel="noopener noreferrer"
