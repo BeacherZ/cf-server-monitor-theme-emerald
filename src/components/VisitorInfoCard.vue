@@ -50,12 +50,10 @@ const visitTime = ref(formatVisitTime(new Date()))
 const flagVisible = ref(true)
 const expand = ref(false)
 
-// 访客卡片出现后自动淡出隐藏：数据就绪 → 延迟 1s 淡入 → 展示 8s → 1s 淡出后移除
-const APPEAR_DELAY_MS = 1000
+// 访客卡片：数据就绪后立即显示，展示 8s 后 1s 淡出并移除
 const VISIBLE_MS = 8000
 const FADE_MS = 1000
 
-const cardVisible = ref(false)
 const cardLeaving = ref(false)
 const cardRemoved = ref(false)
 const isHovering = ref(false)
@@ -86,14 +84,14 @@ function scheduleHide() {
 }
 
 function pauseHide() {
-  if (!cardVisible.value || cardLeaving.value || cardRemoved.value)
+  if (cardLeaving.value || cardRemoved.value)
     return
   clearHideTimers()
 }
 
 // 悬停或展开时不打断阅读，离开后重新计 8 秒
 watch([expand, isHovering], ([expanded, hovering]) => {
-  if (!cardVisible.value || cardLeaving.value || cardRemoved.value)
+  if (cardLeaving.value || cardRemoved.value)
     return
   if (expanded || hovering)
     pauseHide()
@@ -450,9 +448,7 @@ onMounted(async () => {
 
   loading.value = false
 
-  // 数据就绪后再等 1 秒才淡入，避免"骨架屏 + 内容"两次跳变
-  await new Promise(resolve => window.setTimeout(resolve, APPEAR_DELAY_MS))
-  cardVisible.value = true
+  // 数据就绪后立即显示，无淡入动画
   scheduleHide()
 })
 </script>
@@ -460,13 +456,13 @@ onMounted(async () => {
 <template>
   <div
     v-if="!cardRemoved"
-    class="visitor-card-fade pointer-events-none fixed inset-x-0 bottom-2.5 z-30 flex justify-center transition-[opacity,transform] duration-1000 ease-out"
-    :class="cardVisible && !cardLeaving ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'"
+    class="visitor-card-fade pointer-events-none fixed inset-x-0 bottom-2.5 z-30 flex justify-center"
+    :class="cardLeaving ? 'opacity-0 translate-y-2 transition-[opacity,transform] duration-1000 ease-out' : 'opacity-100 translate-y-0'"
   >
     <div
       class="cursor-default p-1.5 px-3 shadow-[-1px_-1px_0_background,0_0_16px_rgba(0,0,0,0.05)] transition-[border-radius,transform,background-color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] bg-background/30 backdrop-blur-sm"
       :class="[
-        cardVisible && !cardLeaving ? 'pointer-events-auto' : 'pointer-events-none',
+        cardLeaving ? 'pointer-events-none' : 'pointer-events-auto',
         expand
           ? 'rounded-lg -translate-y-1 bg-background/38 shadow-[-1px_-1px_0_background,0_10px_28px_rgba(0,0,0,0.08)]'
           : 'rounded-xl',
