@@ -11,7 +11,7 @@
 ### 1. 探针后台要填的地址
 
 ```
-https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/9d82c3cd8db88ca9831598eaef5ff105efdc0a68
+https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/63360506b86f25a9632085ccd2f30ea52d566868
 ```
 
 填写位置：CF Server Monitor 后台 → 设置 → 主题 → 「自定义主题 URL」→ 粘贴 → 预览 → 启用自定义 → 保存。
@@ -29,7 +29,7 @@ https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/9d82c3cd8db88ca
 
 ### 3. 后台地址为什么是一串乱码
 
-那串是 `build` 分支某一次提交的 commit id（这里对应短号 `9d82c3c`）。用固定 commit 而不是写 `build` 分支名，是为了锁版本 —— 重新构建不会悄悄替换掉你在用的主题。
+那串是 `build` 分支某一次提交的 commit id（这里对应短号 `6336050`）。用固定 commit 而不是写 `build` 分支名，是为了锁版本 —— 重新构建不会悄悄替换掉你在用的主题。
 
 ### 4. 改完代码后如何重新发布
 

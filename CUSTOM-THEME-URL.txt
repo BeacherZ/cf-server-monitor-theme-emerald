@@ -1,7 +1,7 @@
 # 探针后台「自定义主题 URL」要填的地址
 
 ```
-https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/9d82c3cd8db88ca9831598eaef5ff105efdc0a68
+https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/63360506b86f25a9632085ccd2f30ea52d566868
 ```
 
 ## 填在哪
@@ -10,7 +10,7 @@ CF Server Monitor 后台 → 设置 → 主题 → 「自定义主题 URL」→ 
 
 ## 这个地址是什么
 
-- 它指向本仓库 `build` 分支的一次提交（`9d82c3c`），里面是编译好的 `index.html` + `assets/`。
+- 它指向本仓库 `build` 分支的一次提交（`6336050`），里面是编译好的 `index.html` + `assets/`。
 - 探针只认这个分支的产物，不读 `main` 分支的源码。
 - 写死 commit id（而不是写 `build`）是为了固定版本：以后重新构建也不会悄悄换掉正在用的主题。
 
