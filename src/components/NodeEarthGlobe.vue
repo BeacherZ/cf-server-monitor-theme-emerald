@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Arc, COBEOptions, Globe, Marker } from 'cobe'
+import type { COBEOptions, Globe, Marker } from 'cobe'
 import type { ComponentPublicInstance } from 'vue'
 import type { NodeData } from '@/stores/nodes'
 import { Icon } from '@iconify/vue'
@@ -153,13 +153,6 @@ const regionRates = computed<Map<string, RegionRate>>(() => {
   return map
 })
 
-const arcsEnabled = computed(() => appStore.visitorInfoCardEnabled && appStore.visitorCountryCode != null)
-const userCoord = computed<[number, number] | null>(() => {
-  if (!appStore.visitorInfoCardEnabled)
-    return null
-  return getCoordByCode(appStore.visitorCountryCode)
-})
-
 const clusterOverlayEls = new Map<string, HTMLDivElement>()
 const clusterOverlayRefBinders = new Map<string, (el: Element | ComponentPublicInstance | null) => void>()
 
@@ -260,18 +253,7 @@ const markers = computed<Marker[]>(() => {
   }))
 })
 
-// 从各地区汇聚到用户当前位置；无用户坐标时回退到 hub 拓扑
-const arcs = computed<Arc[]>(() => {
-  const clusters = regionClusters.value
-  const user = userCoord.value
-  if (!arcsEnabled.value || !user || clusters.length === 0)
-    return []
-  return clusters.map(cluster => ({
-    from: cluster.coord,
-    to: user,
-  }))
-})
-
+// 蓝色连线弧已移除，仅保留地区标记
 const themeColors = computed(() => {
   if (appStore.isDark) {
     return {
@@ -280,7 +262,6 @@ const themeColors = computed(() => {
       baseColor: [0.32, 0.33, 0.4] as [number, number, number],
       markerColor: [0.4, 0.7, 1.0] as [number, number, number],
       glowColor: [0.2, 0.25, 0.45] as [number, number, number],
-      arcColor: [0.45, 0.75, 1.0] as [number, number, number],
     }
   }
   return {
@@ -289,7 +270,6 @@ const themeColors = computed(() => {
     baseColor: [1, 1, 1] as [number, number, number],
     markerColor: [0.21, 0.51, 0.93] as [number, number, number],
     glowColor: [1, 1, 1] as [number, number, number],
-    arcColor: [0.21, 0.51, 0.93] as [number, number, number],
   }
 })
 
@@ -310,10 +290,6 @@ function buildInitialOptions(): COBEOptions {
     markerColor: colors.markerColor,
     glowColor: colors.glowColor,
     markers: markers.value,
-    arcs: arcs.value,
-    arcColor: colors.arcColor,
-    arcWidth: 0.8,
-    arcHeight: 0.4,
     markerElevation: MARKER_ELEVATION,
   }
 }
@@ -436,11 +412,11 @@ watch(
 )
 
 watch(
-  [() => regionClusters.value.map(clusterKey).join(','), userCoord],
+  () => regionClusters.value.map(clusterKey).join(','),
   async () => {
     if (!globe)
       return
-    globe.update({ markers: markers.value, arcs: arcs.value })
+    globe.update({ markers: markers.value })
     await nextTick()
     syncClusterOverlayPositions()
     if (!shouldAutoRotate.value)
