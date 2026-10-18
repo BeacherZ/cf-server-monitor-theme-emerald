@@ -11,7 +11,7 @@
 ### 1. 探针后台要填的地址
 
 ```
-https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/d032cc0a945de53f4df7094e262c415bdaabfc8c
+https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/c6a1d2b4d0b96784cb81b35b6f392e948bb8aecc
 ```
 
 填写位置：CF Server Monitor 后台 → 设置 → 主题 → 「自定义主题 URL」→ 粘贴 → 预览 → 启用自定义 → 保存。
@@ -29,7 +29,7 @@ https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/d032cc0a945de53
 
 ### 3. 后台地址为什么是一串乱码
 
-那串是 `build` 分支某一次提交的 commit id（这里对应短号 `d032cc0`）。用固定 commit 而不是写 `build` 分支名，是为了锁版本 —— 重新构建不会悄悄替换掉你在用的主题。
+那串是 `build` 分支某一次提交的 commit id（这里对应短号 `c6a1d2b`）。用固定 commit 而不是写 `build` 分支名，是为了锁版本 —— 重新构建不会悄悄替换掉你在用的主题。
 
 ### 4. 改完代码后如何重新发布
 
@@ -43,8 +43,9 @@ bash scripts/publish-build.sh   # 推到 build 分支，并打印新地址
 
 ### 5. 本仓库相对上游改了什么
 
-- 只改了一处：`src/components/NodeEarthGlobe.vue` 移除了自转地球上的蓝色连线弧（cobe 的 `arcs`），其余表现与上游 v1.2.10 一致。
-- 想还原：`git revert` 那一次提交后重新按第 4 步发布。
+- 改动 1：`src/components/NodeEarthGlobe.vue` 移除了自转地球上的蓝色连线弧（cobe 的 `arcs`），其余地球表现与上游 v1.2.10 一致。
+- 改动 2：`src/components/Footer.vue` 的「Theme by Emerald」署名链接改为指向本仓库（官方 `Powered by CF Server Monitor` 署名与链接按规范保留）。
+- 想还原某处：`git revert` 对应提交后重新按第 4 步发布。
 
 ---
 
