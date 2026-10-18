@@ -11,7 +11,7 @@
 ### 1. 探针后台要填的地址
 
 ```
-https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/ffa00f65d0e0e856ebca96a365bcf5a632afbb68
+https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/9ec9663fb2b2a8a9c5392e158ca6509f1d9ae568
 ```
 
 填写位置：CF Server Monitor 后台 → 设置 → 主题 → 「自定义主题 URL」→ 粘贴 → 预览 → 启用自定义 → 保存。
@@ -29,7 +29,7 @@ https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/ffa00f65d0e0e85
 
 ### 3. 后台地址为什么是一串乱码
 
-那串是 `build` 分支某一次提交的 commit id（这里对应短号 `ffa00f6`）。用固定 commit 而不是写 `build` 分支名，是为了锁版本 —— 重新构建不会悄悄替换掉你在用的主题。
+那串是 `build` 分支某一次提交的 commit id（这里对应短号 `9ec9663`）。用固定 commit 而不是写 `build` 分支名，是为了锁版本 —— 重新构建不会悄悄替换掉你在用的主题。
 
 ### 4. 改完代码后如何重新发布
 
@@ -46,6 +46,9 @@ bash scripts/publish-build.sh   # 推到 build 分支，并打印新地址
 - 改动 1：`src/components/NodeEarthGlobe.vue` 移除了自转地球上的蓝色连线弧（cobe 的 `arcs`），其余地球表现与上游 v1.2.10 一致。
 - 改动 2：`src/components/Footer.vue` 的「Theme by Emerald」署名链接改为指向本仓库（官方 `Powered by CF Server Monitor` 署名与链接按规范保留）。
 - 改动 3：`src/components/VisitorInfoCard.vue` 访客信息条改为自动隐藏 —— 数据就绪后直接显示（无淡入），展示 8 秒后 1 秒淡出并从页面移除；鼠标悬停或点开详情时暂停计时，离开后重新计 8 秒。
+- 改动 4：`src/utils/tagHelper.ts` 卡片价格行的计费周期跟随语言显示中文 —— `Y→年`、`M→月`、`Q→季`、`D→天`（英文界面仍为 `Y/M/Q/D`）。
+- 改动 5：延迟 / 丢包改为按「本机当前真实有数据的 ping 目标」求平均（双栈 6 个就平均 6 个，仅 V4 就平均 3 个），占位空槽不参与；悬停提示会标注本次平均用了几个目标。
+- 改动 6：`src/composables/useNodePingDisplay.ts` 底部延迟/丢包小方块改为**固定 10 格时间网格**（按 `ping_history` 配置的窗口等分，锚定最新采样点），格子数量恒定不随采样点增减变化，尚无数据的格子显示浅灰占位（悬停提示「无数据」）。
 - 想还原某处：`git revert` 对应提交后重新按第 4 步发布。
 
 ---
