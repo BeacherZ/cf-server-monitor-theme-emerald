@@ -4,7 +4,52 @@
 
 ![preview](/docs/preview.png)
 
+---
+
+## 本仓库怎么用（小白版）
+
+### 1. 探针后台要填的地址
+
+```
+https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/d032cc0a945de53f4df7094e262c415bdaabfc8c
+```
+
+填写位置：CF Server Monitor 后台 → 设置 → 主题 → 「自定义主题 URL」→ 粘贴 → 预览 → 启用自定义 → 保存。
+
+地址也备份在根目录 [`CUSTOM-THEME-URL.txt`](./CUSTOM-THEME-URL.txt)（以后忘了就打开这个文件）。
+
+### 2. 只有两个分支，各管一件事
+
+| 分支 | 内容 | 谁读它 |
+| --- | --- | --- |
+| `main` | 源码（`src/` 里的 `.vue` / `.ts`） | 只给人看和改 |
+| `build` | 编译产物：`index.html` + `assets/` | **探针只读这个** |
+
+所以「构建产物」= `build` 分支的根目录，就是 <https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/build> 这个页面里的 `index.html` 和 `assets/`。仓库里的 `dist/` 只是本地临时目录，已被 git 忽略，不用管。
+
+### 3. 后台地址为什么是一串乱码
+
+那串是 `build` 分支某一次提交的 commit id（这里对应短号 `d032cc0`）。用固定 commit 而不是写 `build` 分支名，是为了锁版本 —— 重新构建不会悄悄替换掉你在用的主题。
+
+### 4. 改完代码后如何重新发布
+
+```bash
+npm install          # 首次需要，装依赖
+npm run build         # 编译，产物在 dist/
+bash scripts/publish-build.sh   # 推到 build 分支，并打印新地址
+```
+
+脚本最后几行会打印形如 `https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/<新commit>` 的地址，把它复制到后台，并顺手更新 `CUSTOM-THEME-URL.txt` 里那行。只想先看看不推送，加环境变量 `DRY_RUN=1`。
+
+### 5. 本仓库相对上游改了什么
+
+- 只改了一处：`src/components/NodeEarthGlobe.vue` 移除了自转地球上的蓝色连线弧（cobe 的 `arcs`），其余表现与上游 v1.2.10 一致。
+- 想还原：`git revert` 那一次提交后重新按第 4 步发布。
+
+---
+
 ## 功能
+
 
 - 卡片和表格两种节点视图
 - 多分组、搜索、地区旗帜和操作系统图标
