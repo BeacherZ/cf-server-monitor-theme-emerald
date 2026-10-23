@@ -18,28 +18,28 @@ https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/3d68e1319e00de6
 
 地址也备份在根目录 [`CUSTOM-THEME-URL.txt`](./CUSTOM-THEME-URL.txt)（以后忘了就打开这个文件）。
 
-### 2. 只有两个分支，各管一件事
+### 2. 分支只有一个，产物挂在一个标签上
 
-| 分支 | 内容 | 谁读它 |
+| 位置 | 内容 | 谁读它 |
 | --- | --- | --- |
-| `main` | 源码（`src/` 里的 `.vue` / `.ts`） | 只给人看和改 |
-| `build` | 编译产物：`index.html` + `assets/` | **探针只读这个** |
+| `main` 分支 | 源码（`src/` 里的 `.vue` / `.ts`） | 只给人看和改 |
+| `theme-dist` 标签 | 编译产物：`index.html` + `assets/` | **探针只读这个** |
 
-所以「构建产物」= `build` 分支的根目录，就是 <https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/build> 这个页面里的 `index.html` 和 `assets/`。仓库里的 `dist/` 只是本地临时目录，已被 git 忽略，不用管。
+原来的 `build` 分支已删除（看着乱），产物改为挂在 `theme-dist` 这个 tag 上，指向同一棵提交树。tag 在「Tags / 标签」页，不占分支列表。仓库里的 `dist/` 只是本地临时目录，已被 git 忽略，不用管。
 
 ### 3. 后台地址为什么是一串乱码
 
-那串是 `build` 分支某一次提交的 commit id（这里对应短号 `3d68e13`）。用固定 commit 而不是写 `build` 分支名，是为了锁版本 —— 重新构建不会悄悄替换掉你在用的主题。
+那串是被 `theme-dist` 标签指着的那次提交的 commit id（这里对应短号 `3d68e13`）。用固定 commit 而不是写标签名，是为了锁版本 —— 重新构建不会悄悄替换掉你在用的主题。
 
 ### 4. 改完代码后如何重新发布
 
 ```bash
 npm install          # 首次需要，装依赖
 npm run build         # 编译，产物在 dist/
-bash scripts/publish-build.sh   # 推到 build 分支，并打印新地址
+python ../api_pretty2.py   # 上传 dist、碰一个「无 4/7、尾 68」的提交号、把 theme-dist 指过去
 ```
 
-脚本最后几行会打印形如 `https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/<新commit>` 的地址，把它复制到后台，并顺手更新 `CUSTOM-THEME-URL.txt` 里那行。只想先看看不推送，加环境变量 `DRY_RUN=1`。
+最后一行会打印形如 `https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/<新commit>` 的地址，把它复制到后台，并顺手更新 `CUSTOM-THEME-URL.txt` 里那行。
 
 ### 5. 本仓库相对上游改了什么
 
