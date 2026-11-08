@@ -11,7 +11,7 @@
 ### 1. 探针后台要填的地址
 
 ```
-https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/1620f26a9b32c6530c3e35603ac18a9d9ccec568
+https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/dd9686190c3b2b991ef9df3a06ce5ea0d2e0ce68
 ```
 
 填写位置：CF Server Monitor 后台 → 设置 → 主题 → 「自定义主题 URL」→ 粘贴 → 预览 → 启用自定义 → 保存。
@@ -29,7 +29,7 @@ https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/1620f26a9b32c65
 
 ### 3. 后台地址为什么是一串乱码
 
-那串是被 `theme-dist` 标签指着的那次提交的 commit id（这里对应短号 `1620f26`）。用固定 commit 而不是写标签名，是为了锁版本 —— 重新构建不会悄悄替换掉你在用的主题。
+那串是被 `theme-dist` 标签指着的那次提交的 commit id（这里对应短号 `dd96861`）。用固定 commit 而不是写标签名，是为了锁版本 —— 重新构建不会悄悄替换掉你在用的主题。
 
 ### 4. 改完代码后如何重新发布
 
@@ -45,11 +45,11 @@ python ../api_pretty2.py   # 上传 dist、碰一个「无 4/7、尾 68」的提
 
 - 改动 1：`src/components/NodeEarthGlobe.vue` 移除了自转地球上的蓝色连线弧（cobe 的 `arcs`），其余地球表现与上游 v1.2.10 一致。
 - 改动 2：`src/components/VisitorInfoCard.vue` 访客信息条改为自动隐藏 —— 数据就绪后直接显示（无淡入），展示 8 秒后 1 秒淡出并从页面移除；只有**真实鼠标悬停**才暂停计时（触摸操作不计入，避免移动端点击后卡住），展开/收起都重新计 8 秒，展开状态下也会正常淡出。
-- 改动 3：卡片加一圈 1px 描边（`src/styles/main.css` 里的 `.card-outline`，用 `var(--border)`，浅色浅灰 / 深色白 10%），只加描边不加投影；卡片底色仍是原来的 `bg-background/80` 半透明。该规则刻意不放进 `@layer`，这样组件里原有的 `border-none` 不用逐个删也压得住。
-- 改动 4：`src/utils/tagHelper.ts` 卡片价格行的计费周期跟随语言显示中文 —— `Y→年`、`M→月`、`Q→季`、`D→天`（英文界面仍为 `Y/M/Q/D`）。
-- 改动 5：`src/components/NodeCard.vue` 在卡片底部标签行右端增加 `V4` / `V6` 小徽章，用探针上报的 `ipv4` / `ipv6` 字段判断该实例支持的协议栈，只显示实际拥有的（单栈机器只出现一个），两者都没有则不占位；样式沿用自定义标签的描边徽章。
-- 改动 6：`src/utils/tagHelper.ts` 的 `hasIPv4` / `hasIPv6` 按后端真实语义实现 —— 探针 `/api/servers` 里的 `ip_v4` / `ip_v6` 是**标志位**（`"1"` 有、`"0"` 空），不是 IP 字符串；访客态后端通常一律下发 `"0"`，所以未登录看不到这两个标记属正常。同时保留地址格式兜底（IPv4 排除私网/回环/CGNAT，IPv6 只认 `2000::/3` 全球单播），并兼容后端返回数字 `0/1` 的情况。
-- 改动 7：`src/components/NodeCard.vue` 卡片默认常驻 emerald 光晕（`shadow-[0_0_20px]` + `shadow-emerald-600/10`，原来是 `hover` 才有）；鼠标悬停仍沿用原来的「光晕 + 1px emerald 描边环 + 上移 0.5px」，离线卡片改为常驻红色光晕（`shadow-red-600/15`）。
+- 改动 3：`src/utils/tagHelper.ts` 卡片价格行的计费周期跟随语言显示中文 —— `Y→年`、`M→月`、`Q→季`、`D→天`（英文界面仍为 `Y/M/Q/D`）。
+- 改动 4：`src/components/NodeCard.vue` 在卡片底部标签行右端增加 `V4` / `V6` 小徽章，用探针上报的 `ipv4` / `ipv6` 字段判断该实例支持的协议栈，只显示实际拥有的（单栈机器只出现一个），两者都没有则不占位；样式沿用自定义标签的描边徽章。
+- 改动 5：`src/utils/tagHelper.ts` 的 `hasIPv4` / `hasIPv6` 按后端真实语义实现 —— 探针 `/api/servers` 里的 `ip_v4` / `ip_v6` 是**标志位**（`"1"` 有、`"0"` 空），不是 IP 字符串；访客态后端通常一律下发 `"0"`，所以未登录看不到这两个标记属正常。同时保留地址格式兜底（IPv4 排除私网/回环/CGNAT，IPv6 只认 `2000::/3` 全球单播），并兼容后端返回数字 `0/1` 的情况。
+- 改动 6：`src/components/NodeCard.vue` 卡片默认常驻 emerald 光晕（`shadow-[0_0_20px]` + `shadow-emerald-600/10`，原来是 `hover` 才有）；鼠标悬停仍沿用原来的「光晕 + 1px emerald 描边环 + 上移 0.5px」，离线卡片改为常驻红色光晕（`shadow-red-600/15`）。
+- 改动 7：卡片**不加描边**（之前 fork 加过 `.card-outline`，现已移除）。`CardX.vue` 的 `bordered` 默认值改为 `false`，`NodeList.vue` 表头/行与 `PingChart.vue` 面板上的 `card-outline` 一并删掉，卡片区分只靠底色、圆角与光晕。
 
 ---
 
