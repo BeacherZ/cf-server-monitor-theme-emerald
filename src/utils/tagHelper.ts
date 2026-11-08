@@ -407,15 +407,51 @@ export function formatPriceWithCycle(
 }
 
 /**
- * 检查是否有 IPv4
+ * 检查该实例是否真的具备可用的公网 IPv4。
+ * 探针后端对「没填」常用 0.0.0.0 / - / 空串占位，也可能是内网地址，
+ * 这些都不算，否则徽章会误报。
  */
 export function hasIPv4(ipv4: string | undefined | null): boolean {
-  return !!ipv4 && ipv4.trim() !== ''
+  const value = (ipv4 ?? '').trim()
+  if (!value)
+    return false
+  const parts = value.split('.')
+  if (parts.length !== 4)
+    return false
+  if (parts.some(part => !/^\d{1,3}$/.test(part) || Number(part) > 255))
+    return false
+  // 0.0.0.0/8、回环、私网、链路本地、CGNAT、文档保留段
+  if (/^(0|10|127)\./.test(value))
+    return false
+  if (/^169\.254\./.test(value) || /^192\.168\./.test(value))
+    return false
+  if (/^172\.(1[6-9]|2\d|3[01])\./.test(value))
+    return false
+  if (/^100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\./.test(value))
+    return false
+  if (/^(192\.0\.2|198\.51\.100|203\.0\.113)\./.test(value))
+    return false
+  return value !== '255.255.255.255'
 }
 
 /**
- * 检查是否有 IPv6
+ * 检查该实例是否真的具备可用的公网 IPv6。
+ * 只认全球单播段 2000::/3，占位值（::）、回环、链路本地 fe80::、
+ * ULA fd00::/fc00::、v4 映射地址和带 zone 的地址一律不算。
  */
 export function hasIPv6(ipv6: string | undefined | null): boolean {
-  return !!ipv6 && ipv6.trim() !== ''
+  const value = (ipv6 ?? '').trim().toLowerCase()
+  if (!value || !value.includes(':'))
+    return false
+  if (value === '::' || value === '::1' || value.includes('%'))
+    return false
+  if (value.startsWith('::ffff:'))
+    return false
+  if (/^fe[89ab]/.test(value) || /^f[cd]/.test(value))
+    return false
+  if (/^64:ff9b/.test(value) || /^2001:db8/.test(value))
+    return false
+  const head = Number.parseInt(value.split(':')[0] ?? '', 16)
+  // 2000::/3 —— 全球单播地址范围
+  return Number.isFinite(head) && head >= 0x2000 && head <= 0x3fff
 }
