@@ -407,14 +407,11 @@ export function formatPriceWithCycle(
 }
 
 /**
- * 检查该实例是否真的具备可用的公网 IPv4。
- * 探针后端对「没填」常用 0.0.0.0 / - / 空串占位，也可能是内网地址，
- * 这些都不算，否则徽章会误报。
+ * 探针后端 `/api/servers` 里的 `ip_v4` / `ip_v6` 是**标志位**而不是地址：
+ * `"1"` 表示该实例具备对应协议栈，`"0"` / 空表示没有（访客态通常一律下发 `"0"`）。
+ * 为了兼容个别直接下发真实地址的后端，仍然保留了地址格式兜底判断。
  */
-export function hasIPv4(ipv4: string | undefined | null): boolean {
-  const value = (ipv4 ?? '').trim()
-  if (!value)
-    return false
+function isPublicIPv4(value: string): boolean {
   const parts = value.split('.')
   if (parts.length !== 4)
     return false
@@ -434,14 +431,9 @@ export function hasIPv4(ipv4: string | undefined | null): boolean {
   return value !== '255.255.255.255'
 }
 
-/**
- * 检查该实例是否真的具备可用的公网 IPv6。
- * 只认全球单播段 2000::/3，占位值（::）、回环、链路本地 fe80::、
- * ULA fd00::/fc00::、v4 映射地址和带 zone 的地址一律不算。
- */
-export function hasIPv6(ipv6: string | undefined | null): boolean {
-  const value = (ipv6 ?? '').trim().toLowerCase()
-  if (!value || !value.includes(':'))
+/** 只认全球单播段 2000::/3，占位值、回环、链路本地、ULA、v4 映射一律不算 */
+function isPublicIPv6(value: string): boolean {
+  if (!value.includes(':'))
     return false
   if (value === '::' || value === '::1' || value.includes('%'))
     return false
@@ -452,6 +444,31 @@ export function hasIPv6(ipv6: string | undefined | null): boolean {
   if (/^64:ff9b/.test(value) || /^2001:db8/.test(value))
     return false
   const head = Number.parseInt(value.split(':')[0] ?? '', 16)
-  // 2000::/3 —— 全球单播地址范围
   return Number.isFinite(head) && head >= 0x2000 && head <= 0x3fff
+}
+
+function resolveStackFlag(value: string | number | null | undefined, probe: (raw: string) => boolean): boolean {
+  // 后端可能返回数字 0 / 1，统一按字符串处理
+  const raw = String(value ?? '').trim()
+  if (!raw)
+    return false
+  if (raw === '1' || /^true$/i.test(raw))
+    return true
+  if (raw === '0' || /^(?:false|-|n\/a|null|undefined)$/i.test(raw))
+    return false
+  return probe(raw.toLowerCase())
+}
+
+/**
+ * 该实例是否具备 IPv4。
+ */
+export function hasIPv4(ipv4: string | number | null | undefined): boolean {
+  return resolveStackFlag(ipv4, isPublicIPv4)
+}
+
+/**
+ * 该实例是否具备 IPv6。
+ */
+export function hasIPv6(ipv6: string | number | null | undefined): boolean {
+  return resolveStackFlag(ipv6, isPublicIPv6)
 }
