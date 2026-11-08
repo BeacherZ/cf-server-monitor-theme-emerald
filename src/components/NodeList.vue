@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { NodeData } from '@/stores/nodes'
 import { Icon } from '@iconify/vue'
-import { computed, ref } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import NodePingListCell from '@/components/NodePingListCell.vue'
 import TrafficProgress from '@/components/TrafficProgress.vue'
 import { Badge } from '@/components/ui/badge'
@@ -42,11 +42,51 @@ const { pickSurfaceClass } = useBackgroundSurface()
 // show_price 关闭时访客不可见价格，仅保留剩余时间（管理员不受影响）
 const canViewPrice = computed(() => appStore.canViewPrice)
 
-const columns: ColumnConfig[] = [
+/**
+ * 标签列宽：每行是独立 grid，`fit-content` 会按各自内容出不同宽度导致 IP 位置逐行错开。
+ * 这里在渲染后量出「最宽的一组标签」，取统一宽度，富余全部让给节点列，
+ * 于是标签列右侧不再有大片留白，IP 紧跟其后、贴着 CPU。
+ */
+const TAGS_COL_MIN = 104
+const TAGS_COL_MAX = 260
+const tagsColWidth = ref(TAGS_COL_MIN)
+const rootRef = ref<HTMLElement | null>(null)
+
+function measureTagsColumn() {
+  const root = rootRef.value
+  if (!root)
+    return
+  const cells = Array.from(root.querySelectorAll<HTMLElement>('[data-tags-row]'))
+  if (cells.length === 0)
+    return
+  let max = 0
+  for (const cell of cells) {
+    const prev = cell.style.width
+    cell.style.width = 'max-content'
+    max = Math.max(max, Math.ceil(cell.offsetWidth))
+    cell.style.width = prev
+  }
+  if (max > 0)
+    tagsColWidth.value = Math.min(TAGS_COL_MAX, Math.max(TAGS_COL_MIN, max + 8))
+}
+
+onMounted(() => {
+  nextTick(measureTagsColumn)
+  if (typeof document !== 'undefined' && document.fonts)
+    document.fonts.ready.then(() => nextTick(measureTagsColumn)).catch(() => {})
+})
+
+watch(
+  () => props.nodes.map(node => getCustomTags(node).join('|')).join('||'),
+  () => nextTick(measureTagsColumn),
+  { flush: 'post' },
+)
+
+const columns = computed<ColumnConfig[]>(() => [
   { key: 'status', label: '状态', width: '40px', sortable: true },
   { key: 'os', label: '系统', width: '40px', sortable: true },
-  { key: 'name', label: '节点', width: 'minmax(150px, 0.8fr)', sortable: true },
-  { key: 'tags', label: '标签', width: 'minmax(180px, 1fr)', sortable: false },
+  { key: 'name', label: '节点', width: 'minmax(150px, 1fr)', sortable: true },
+  { key: 'tags', label: '标签', width: `${tagsColWidth.value}px`, sortable: false },
   { key: 'stack', label: 'IP', width: '64px', sortable: false },
   { key: 'cpu', label: 'CPU', width: '100px', sortable: true },
   { key: 'mem', label: '内存', width: '100px', sortable: true },
@@ -54,7 +94,7 @@ const columns: ColumnConfig[] = [
   { key: 'traffic', label: '流量', width: '100px', sortable: true },
   { key: 'rate', label: '速率', width: '80px', sortable: true },
   { key: 'latency', label: '延迟', width: '136px', sortable: false },
-]
+])
 
 // 实例支持的协议栈：只显示探针实际上报了的地址族
 function stackBadges(node: NodeData) {
@@ -119,10 +159,10 @@ const formatBytes = (bytes: number) => formatBytesWithConfig(bytes)
 const formatBytesPerSecond = (bytes: number) => formatBytesPerSecondWithConfig(bytes)
 const formatUptime = (seconds: number) => formatUptimeWithFormat(seconds, 'hour')
 
-const columnKeys = computed(() => columns.map(c => c.key))
+const columnKeys = computed(() => columns.value.map(c => c.key))
 
 const gridStyle = computed(() => ({
-  gridTemplateColumns: columns.map(c => c.width).join(' '),
+  gridTemplateColumns: columns.value.map(c => c.width).join(' '),
 }))
 
 const offlineOverlayContentStyle = computed(() => {
@@ -162,7 +202,7 @@ function getRowTransitionStyle(index: number): Record<string, string> {
 </script>
 
 <template>
-  <div class="overflow-x-auto overflow-y-hidden min-w-0 p-1 -m-1">
+  <div ref="rootRef" class="overflow-x-auto overflow-y-hidden min-w-0 p-1 -m-1">
     <div class="min-w-fit w-full flex flex-col gap-1">
       <!-- 表头 -->
       <div
@@ -236,7 +276,7 @@ function getRowTransitionStyle(index: number): Record<string, string> {
 
               <!-- 标签 -->
               <div v-else-if="col.key === 'tags'">
-                <div class="flex flex-wrap gap-1 items-center">
+                <div data-tags-row class="flex flex-wrap gap-1 items-center">
                   <Badge
                     v-for="(tag, tagIndex) in getCustomTags(node)" :key="tagIndex" variant="outline"
                     class="!text-[11px] rounded border-border px-1.5 text-muted-foreground"
