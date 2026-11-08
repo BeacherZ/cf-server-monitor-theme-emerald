@@ -353,7 +353,7 @@ function openPingDialog() {
           <div class="min-w-0 flex flex-wrap gap-1 items-center">
             <Badge
               v-for="(tag, index) in customTags" :key="index" variant="outline"
-              class="!text-[11px] rounded border-transparent px-1.5 bg-emerald-600/10 text-emerald-700 dark:text-emerald-400"
+              class="!text-[11px] rounded border-transparent px-1.5 bg-slate-500/10 text-slate-600 dark:bg-slate-400/15 dark:text-slate-300"
             >
               {{ tag }}
             </Badge>
