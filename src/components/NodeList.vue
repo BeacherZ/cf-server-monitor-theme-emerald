@@ -45,8 +45,8 @@ const canViewPrice = computed(() => appStore.canViewPrice)
 const columns: ColumnConfig[] = [
   { key: 'status', label: '状态', width: '40px', sortable: true },
   { key: 'os', label: '系统', width: '40px', sortable: true },
-  { key: 'name', label: '节点', width: 'minmax(150px, 220px)', sortable: true },
-  { key: 'tags', label: '标签', width: '140px', sortable: false },
+  { key: 'name', label: '节点', width: 'minmax(150px, 1fr)', sortable: true },
+  { key: 'tags', label: '标签', width: 'fit-content(160px)', sortable: false },
   { key: 'stack', label: 'IP', width: '76px', sortable: false },
   { key: 'cpu', label: 'CPU', width: 'minmax(100px, 1fr)', sortable: true },
   { key: 'mem', label: '内存', width: 'minmax(100px, 1fr)', sortable: true },
