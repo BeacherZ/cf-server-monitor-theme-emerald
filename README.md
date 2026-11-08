@@ -43,13 +43,16 @@ python ../api_pretty2.py   # 上传 dist、碰一个「无 4/7、尾 68」的提
 
 ### 5. 本仓库相对上游改了什么
 
-- 改动 1：`src/components/NodeEarthGlobe.vue` 移除了自转地球上的蓝色连线弧（cobe 的 `arcs`），其余地球表现与上游 v1.2.10 一致。
-- 改动 2：`src/components/VisitorInfoCard.vue` 访客信息条改为自动隐藏 —— 数据就绪后直接显示（无淡入），展示 8 秒后 1 秒淡出并从页面移除；只有**真实鼠标悬停**才暂停计时（触摸操作不计入，避免移动端点击后卡住），展开/收起都重新计 8 秒，展开状态下也会正常淡出。
-- 改动 3：`src/utils/tagHelper.ts` 卡片价格行的计费周期跟随语言显示中文 —— `Y→年`、`M→月`、`Q→季`、`D→天`（英文界面仍为 `Y/M/Q/D`）。
-- 改动 4：`src/components/NodeCard.vue` 在卡片底部标签行右端增加 `V4` / `V6` 小徽章，用探针上报的 `ipv4` / `ipv6` 字段判断该实例支持的协议栈，只显示实际拥有的（单栈机器只出现一个），两者都没有则不占位；样式沿用自定义标签的描边徽章。
-- 改动 5：`src/utils/tagHelper.ts` 的 `hasIPv4` / `hasIPv6` 按后端真实语义实现 —— 探针 `/api/servers` 里的 `ip_v4` / `ip_v6` 是**标志位**（`"1"` 有、`"0"` 空），不是 IP 字符串；访客态后端通常一律下发 `"0"`，所以未登录看不到这两个标记属正常。同时保留地址格式兜底（IPv4 排除私网/回环/CGNAT，IPv6 只认 `2000::/3` 全球单播），并兼容后端返回数字 `0/1` 的情况。
-- 改动 6：`src/components/NodeCard.vue` 卡片默认常驻 emerald 光晕（`shadow-[0_0_20px]` + `shadow-emerald-600/10`，原来是 `hover` 才有）；鼠标悬停仍沿用原来的「光晕 + 1px emerald 描边环 + 上移 0.5px」，离线卡片改为常驻红色光晕（`shadow-red-600/15`）。
-- 改动 7：卡片**不加描边**（之前 fork 加过 `.card-outline`，现已移除）。`CardX.vue` 的 `bordered` 默认值改为 `false`，`NodeList.vue` 表头/行与 `PingChart.vue` 面板上的 `card-outline` 一并删掉，卡片区分只靠底色、圆角与光晕。
+上游是 [`Tokinx/cf-server-monitor-theme-emerald`](https://github.com/Tokinx/cf-server-monitor-theme-emerald) v1.2.10。只动外观和展示层，数据采集、延迟丢包统计、计费与告警逻辑一行没碰。
+
+| # | 文件 | 改了什么 |
+| :-- | :-- | :-- |
+| 1 | `NodeEarthGlobe.vue` | 去掉地球上的蓝色连线弧，其余地球表现与上游一致 |
+| 2 | `VisitorInfoCard.vue` | 访客信息条改为自动隐藏：数据就绪直接显示（不淡入），8 秒后 1 秒淡出；只有真实鼠标悬停才暂停计时，展开/收起都重新计 8 秒 |
+| 3 | `utils/tagHelper.ts` | 计费周期中文化：`Y→年`、`M→月`、`Q→季`、`D→天`（英文界面不变） |
+| 4 | `NodeCard.vue`<br>`utils/tagHelper.ts` | 卡片标签行右端新增 `V4` / `V6` 徽章。后端 `/api/servers` 的 `ip_v4` / `ip_v6` 是标志位（`"1"` 有、`"0"` 无）而不是 IP，所以只显示实际具备的协议栈；访客态后端一律下发 `"0"`，那时不显示属正常 |
+| 5 | `NodeCard.vue` | 卡片常驻 emerald 光晕（上游只有 hover 才有），hover 时额外一圈细亮边并上浮 0.5px；离线卡片常驻红色光晕 |
+| 6 | `CardX.vue`<br>`NodeList.vue`<br>`PingChart.vue`<br>`styles/main.css` | 所有卡片不画描边（`bordered` 默认关闭，`.card-outline` 已删除），只靠底色、圆角和光晕区分 |
 
 ---
 
