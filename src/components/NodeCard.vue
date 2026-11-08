@@ -13,6 +13,7 @@ import { useNodesStore } from '@/stores/nodes'
 import { getApiAssetUrl } from '@/utils/api'
 import { formatBytesPerSecondWithConfig, formatBytesWithConfig, formatDateTime, formatUptimeWithFormat, getStatus } from '@/utils/helper'
 import { formatOfflineTime, getCustomTags, getPriceTags, getRemainingTimeTagClass, getTrafficLevel, getTrafficUsed, getTrafficUsedPercentage, hasRegion, showTrafficProgress } from '@/utils/nodeHelper'
+import { hasIPv4, hasIPv6 } from '@/utils/tagHelper'
 import { getOSImage, getOSName } from '@/utils/osImageHelper'
 import { getRegionCode, getRegionDisplayName } from '@/utils/regionHelper'
 
@@ -47,6 +48,15 @@ const canViewPrice = computed(() => appStore.canViewPrice)
 const priceTags = computed(() => getPriceTags(props.node, appStore.lang, canViewPrice.value))
 const remainingTimeTagClass = computed(() => getRemainingTimeTagClass(props.node))
 const customTags = computed(() => getCustomTags(props.node))
+// 实例支持的协议栈：只显示探针实际上报了的地址族
+const ipStackBadges = computed(() => {
+  const badges: string[] = []
+  if (hasIPv4(props.node.ipv4))
+    badges.push('V4')
+  if (hasIPv6(props.node.ipv6))
+    badges.push('V6')
+  return badges
+})
 
 const {
   latencyRenderBars,
@@ -326,13 +336,26 @@ function openPingDialog() {
             </template>
           </div>
         </div>
-        <div v-if="customTags.length > 0" class="flex shrink-0 flex-wrap gap-1 items-center">
-          <Badge
-            v-for="(tag, index) in customTags" :key="index" variant="outline"
-            class="!text-[11px] rounded text-muted-foreground border-muted-foreground/10 px-1.5"
-          >
-            {{ tag }}
-          </Badge>
+        <div
+          v-if="customTags.length > 0 || ipStackBadges.length > 0"
+          class="flex shrink-0 items-center justify-between gap-2"
+        >
+          <div class="min-w-0 flex flex-wrap gap-1 items-center">
+            <Badge
+              v-for="(tag, index) in customTags" :key="index" variant="outline"
+              class="!text-[11px] rounded text-muted-foreground border-muted-foreground/10 px-1.5"
+            >
+              {{ tag }}
+            </Badge>
+          </div>
+          <div v-if="ipStackBadges.length > 0" class="shrink-0 flex gap-1 items-center">
+            <Badge
+              v-for="badge in ipStackBadges" :key="badge" variant="outline"
+              class="!text-[11px] rounded text-muted-foreground border-muted-foreground/10 px-1.5 tabular-nums"
+            >
+              {{ badge }}
+            </Badge>
+          </div>
         </div>
       </div>
     </template>
