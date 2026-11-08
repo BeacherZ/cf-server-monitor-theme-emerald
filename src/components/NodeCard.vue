@@ -68,10 +68,11 @@ const {
 } = useNodePingDisplay(props.node.uuid)
 const topPingNetworks = computed(() => buildTopPingNetworks(props.node.ping))
 
-// 百分比数值跟随进度条状态上色：<50 正常、50–85 警告、≥85 危险
+// 数值只在「出问题」时上色：正常用正文色，靠字重区分层级；
+// 绿色留给进度条、三网、方块这些真正需要看颜色的地方。
 function statusTextClass(status: 'success' | 'warning' | 'error') {
   switch (status) {
-    case 'success': return 'text-emerald-600 dark:text-emerald-400'
+    case 'success': return 'text-foreground'
     case 'warning': return 'text-amber-600 dark:text-amber-400'
     default: return 'text-red-600 dark:text-red-400'
   }
@@ -122,7 +123,7 @@ function openPingDialog() {
               <span class="text-muted-foreground">
                 CPU
               </span>
-              <span class="font-medium" :class="statusTextClass(cpuStatus)">{{ (props.node.cpu ?? 0).toFixed(1) }}%</span>
+              <span class="font-medium tabular-nums" :class="statusTextClass(cpuStatus)">{{ (props.node.cpu ?? 0).toFixed(1) }}%</span>
             </div>
             <ProgressThin :percentage="props.node.cpu ?? 0" :status="cpuStatus" :height="4" />
             <div class="text-[11px] text-muted-foreground truncate">
@@ -137,7 +138,7 @@ function openPingDialog() {
               <span class="text-muted-foreground">
                 内存
               </span>
-              <span class="font-medium" :class="statusTextClass(memStatus)">{{ memPercentage.toFixed(1) }}%</span>
+              <span class="font-medium tabular-nums" :class="statusTextClass(memStatus)">{{ memPercentage.toFixed(1) }}%</span>
             </div>
             <ProgressThin :percentage="memPercentage" :status="memStatus" :height="4" />
             <DataTooltip placement="top" class="block" :content-class="[!props.node.swap && '!hidden']">
@@ -159,7 +160,7 @@ function openPingDialog() {
               <span class="text-muted-foreground">
                 硬盘
               </span>
-              <span class="font-medium" :class="statusTextClass(diskStatus)">{{ diskPercentage.toFixed(1) }}%</span>
+              <span class="font-medium tabular-nums" :class="statusTextClass(diskStatus)">{{ diskPercentage.toFixed(1) }}%</span>
             </div>
             <ProgressThin :percentage="diskPercentage" :status="diskStatus" :height="4" />
             <div class="text-[11px] text-muted-foreground truncate">
@@ -173,7 +174,7 @@ function openPingDialog() {
               <span class="text-muted-foreground">
                 流量
               </span>
-              <span class="font-medium" :class="statusTextClass(trafficStatus)">{{ trafficUsedPercentage.toFixed(1) }}%</span>
+              <span class="font-medium tabular-nums" :class="statusTextClass(trafficStatus)">{{ trafficUsedPercentage.toFixed(1) }}%</span>
             </div>
             <ProgressThin :percentage="trafficUsedPercentage" :status="trafficStatus" :height="4" />
             <DataTooltip placement="top" class="block">
