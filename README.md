@@ -11,7 +11,7 @@
 ### 1. 探针后台要填的地址
 
 ```
-https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/2afdc6ce99090be89a0aaf29199fef58185f0068
+https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/60d006523659dab88ec21e611d193da319590368
 ```
 
 填写位置：CF Server Monitor 后台 → 设置 → 主题 → 「自定义主题 URL」→ 粘贴 → 预览 → 启用自定义 → 保存。
@@ -31,6 +31,7 @@ https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/2afdc6ce99090be
 | 5 | `NodeCard.vue` | 卡片常驻 emerald 光晕（上游只有 hover 才有），hover 时额外一圈细亮边并上浮 0.5px；离线卡片常驻红色光晕 |
 | 6 | `CardX.vue`<br>`NodeList.vue`<br>`PingChart.vue`<br>`styles/main.css` | 所有卡片不画描边（`bordered` 默认关闭，`.card-outline` 已删除），只靠底色、圆角和光晕区分 |
 | 7 | `NodeCard.vue`<br>`NodeList.vue`<br>`utils/helper.ts` | CPU / 内存 / 硬盘 / 流量的百分比数值正常时不染色（用正文色，靠字重区分层级），`≥60` 转橙、`≥85` 转红，与进度条同一套阈值 —— 颜色只在异常时出现，绿色集中在进度条、三网和方块上；备注标签与 `V4` / `V6` 统一为单色空心描边（`border-border` + `text-muted-foreground`，无底色、无彩色）；速率、在线、费用、三网、延迟丢包各行保持原样 |
+| 8 | `NodeList.vue` | 列表视图在「标签」右侧新增「双栈」列，逐行显示该实例具备的 `V4` / `V6`（判断同卡片），两者都没有时显示 `—`；标签列宽度相应收窄 |
 
 ---
 
