@@ -17,7 +17,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   size: 'medium',
   hoverable: false,
-  bordered: true,
+  bordered: false,
 })
 
 const hasHeaderSlot = defineSlots<{
@@ -61,7 +61,7 @@ const segmentedFooter = computed(() => {
 <template>
   <div
     :class="cn(
-      'card-outline bg-card text-card-foreground flex flex-col rounded-lg',
+      'bg-card text-card-foreground flex flex-col rounded-lg',
       bordered && 'border',
       hoverable && 'transition-colors hover:border-foreground/30',
       props.class,

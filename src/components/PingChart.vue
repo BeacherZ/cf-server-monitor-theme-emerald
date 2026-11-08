@@ -979,7 +979,7 @@ onMounted(() => {
 
         <!-- 图表 -->
         <div
-          class="card-outline h-80 rounded-md p-4 transition-all"
+          class="h-80 rounded-md p-4 transition-all"
           :class="pickSurfaceClass('bg-background/60 hover:bg-background', 'bg-background/50 hover:bg-background backdrop-blur-xl')"
         >
           <VChart :option="pingChartOption" autoresize />

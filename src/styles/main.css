@@ -150,10 +150,3 @@
     justify-content: center;
   }
 }
-
-/* ============ 卡片描边 ============ */
-/* 刻意不放进 @layer：未分层的规则优先级高于 Tailwind 的 border-none，
-   这样组件里原有的 border-none 不用逐个删也能画出边框。 */
-.card-outline {
-  border: 1px solid var(--border);
-}
