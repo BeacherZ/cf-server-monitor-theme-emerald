@@ -1,7 +1,7 @@
 # 探针后台「自定义主题 URL」要填的地址
 
 ```
-https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/532d1cfea8c305832310698095990eb05b239168
+https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/0a33935e83ae5e8ea290a1a091663d096be56a68
 ```
 
 ## 填在哪
