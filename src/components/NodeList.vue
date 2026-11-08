@@ -7,6 +7,7 @@ import TrafficProgress from '@/components/TrafficProgress.vue'
 import { Badge } from '@/components/ui/badge'
 import { DataTooltip } from '@/components/ui/data-tooltip'
 import { ProgressThin } from '@/components/ui/progress-thin'
+import { useBackgroundSurface } from '@/composables/useBackgroundSurface'
 import { useAppStore } from '@/stores/app'
 import { getApiAssetUrl } from '@/utils/api'
 import { formatBytesPerSecondWithConfig, formatBytesWithConfig, formatUptimeWithFormat, getStatus } from '@/utils/helper'
@@ -35,6 +36,7 @@ const rowStaggerMs = 35
 const rowStaggerLimit = 12
 
 const appStore = useAppStore()
+const { pickSurfaceClass } = useBackgroundSurface()
 
 // show_price 关闭时访客不可见价格，仅保留剩余时间（管理员不受影响）
 const canViewPrice = computed(() => appStore.canViewPrice)
@@ -152,7 +154,8 @@ function getRowTransitionStyle(index: number): Record<string, string> {
     <div class="min-w-fit w-full flex flex-col gap-1">
       <!-- 表头 -->
       <div
-        class="grid gap-2 rounded-lg p-2 card-surface-sm"
+        class="card-outline grid gap-2 rounded-lg p-2"
+        :class="pickSurfaceClass('bg-background/80 hover:bg-background', 'bg-background/80 backdrop-blur-sm')"
         :style="gridStyle"
       >
         <div
@@ -176,8 +179,8 @@ function getRowTransitionStyle(index: number): Record<string, string> {
         <div
           v-for="(node, index) in sortedNodes"
           :key="getRowTransitionKey(node)"
-          class="relative flex h-16 cursor-pointer flex-col justify-center rounded-lg px-2 transition-all"
-          :class="node.online ? 'card-surface-sm hover:card-surface-sm-lift' : 'card-surface-sm-danger'"
+          class="card-outline relative flex h-16 cursor-pointer flex-col justify-center rounded-lg px-2 shadow-[0_0_4px,0_0_0_1px] shadow-transparent transition-all bg-background/80 hover:bg-background hover:shadow-emerald-600/10"
+          :class="[pickSurfaceClass('', 'backdrop-blur-sm'), !node.online && '!shadow-red-600/10']"
           :style="getRowTransitionStyle(index)"
           @click="handleClick(node)"
         >

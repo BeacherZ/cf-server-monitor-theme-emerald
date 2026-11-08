@@ -160,7 +160,7 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
     </div>
 
     <div v-if="appStore.alertEnabled && appStore.alertContent" class="alert px-4">
-      <Alert :class="'card-surface border-none rounded-md'">
+      <Alert :class="pickSurfaceClass('border-none bg-background rounded-md', 'border-none bg-background/60 backdrop-blur-xs rounded-md')">
         <AlertTitle v-if="appStore.alertTitle">
           {{ appStore.alertTitle }}
         </AlertTitle>
@@ -182,10 +182,10 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
         <Tabs v-model="appStore.nodeSelectedGroup" class="w-full flex-col gap-4">
           <div class="flex gap-2 items-start flex-nowrap">
             <div class="overflow-x-auto rounded-sm md:pointer-events-auto">
-              <TabsList class="w-max h-8 rounded-md control-surface">
+              <TabsList :class="pickSurfaceClass('w-max h-8 bg-background/60 rounded-md', 'w-max h-8 bg-background/50 backdrop-blur-xl rounded-md')">
                 <TabsTrigger
                   v-for="g in groups" :key="g.name" :value="g.name"
-                  class="h-6.5 flex-none shrink-0 text-xs border-none data-[state=active]:text-emerald-600 data-[state=active]:shadow-[0_1px_2px_rgba(16,24,40,0.06)] shadow-none rounded-sm"
+                  class="h-6.5 flex-none shrink-0 text-xs border-none data-[state=active]:text-emerald-600 shadow-none rounded-sm"
                 >
                   {{ g.tab }}
                 </TabsTrigger>
@@ -193,26 +193,27 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
             </div>
             <div class="ml-auto search flex gap-2 items-center pointer-events-auto">
               <Button
-                variant="glass" size="icon" aria-label="卡片视图"
-                class="h-8 w-8 rounded-md control-surface"
-                :class="appStore.nodeViewMode === 'card' ? 'control-surface-active !text-emerald-600' : 'hover:control-surface-active'"
+                variant="outline" size="icon" aria-label="卡片视图"
+                class="h-8 w-8 border-none shadow-none rounded-md"
+                :class="[pickSurfaceClass('bg-background hover:bg-background/95', 'bg-background/50 hover:bg-background/60 backdrop-blur-xs'), appStore.nodeViewMode === 'card' ? '!text-emerald-600 !bg-background' : '']"
                 @click="appStore.nodeViewMode = 'card'"
               >
                 <Icon icon="tabler:layout-grid" :width="14" :height="14" />
               </Button>
               <Button
-                variant="glass" size="icon" aria-label="列表视图"
-                class="h-8 w-8 rounded-md control-surface"
-                :class="appStore.nodeViewMode === 'list' ? 'control-surface-active !text-emerald-600' : 'hover:control-surface-active'"
+                variant="outline" size="icon" aria-label="列表视图"
+                class="h-8 w-8 border-none shadow-none rounded-md"
+                :class="[pickSurfaceClass('bg-background hover:bg-background/95', 'bg-background/50 hover:bg-background/60 backdrop-blur-xs'), appStore.nodeViewMode === 'list' ? '!text-emerald-600 !bg-background' : '']"
                 @click="appStore.nodeViewMode = 'list'"
               >
                 <Icon icon="tabler:table" :width="14" :height="14" />
               </Button>
               <div class="relative z-1 w-8 h-8">
-                <div class="absolute top-0 right-0 rounded-md control-surface focus-within:control-surface-active">
+                <div class="absolute top-0 right-0 ">
                   <Input
                     v-model="searchText" placeholder="搜索节点名称、地区、系统"
-                    class="h-8 w-8 rounded-md border-none shadow-none bg-transparent transition-all placeholder:text-transparent focus:!w-60 focus:!pl-7.5 focus:placeholder:!text-muted-foreground focus:!ring-emerald-500/10"
+                    class="h-8 w-8 rounded-md border-none shadow-none transition-all placeholder:text-transparent focus:!w-60 focus:!pl-7.5 focus:placeholder:!text-muted-foreground focus:!ring-emerald-500/10"
+                    :class="pickSurfaceClass('bg-background hover:!bg-background/95 focus:!bg-background', 'bg-background/50 hover:!bg-background/60 focus:!bg-background/80 backdrop-blur-xs')"
                   />
                   <Icon
                     icon="tabler:search" :width="14" :height="14"

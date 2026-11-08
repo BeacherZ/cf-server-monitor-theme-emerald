@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { CardX } from '@/components/ui/card-x'
 import { DataTooltip } from '@/components/ui/data-tooltip'
 import { ProgressThin } from '@/components/ui/progress-thin'
+import { useBackgroundSurface } from '@/composables/useBackgroundSurface'
 import { buildTopPingNetworks, useNodePingDisplay } from '@/composables/useNodePingDisplay'
 import { useAppStore } from '@/stores/app'
 import { useNodesStore } from '@/stores/nodes'
@@ -24,6 +25,7 @@ const emit = defineEmits<{
 
 const appStore = useAppStore()
 const nodesStore = useNodesStore()
+const { pickSurfaceClass } = useBackgroundSurface()
 
 const formatBytes = (bytes: number) => formatBytesWithConfig(bytes, appStore.byteDecimals)
 const formatBytesPerSecond = (bytes: number) => formatBytesPerSecondWithConfig(bytes, appStore.byteDecimals)
@@ -64,8 +66,8 @@ function openPingDialog() {
 <template>
   <CardX
     hoverable
-    class="node-card h-full w-full cursor-pointer border-none transition-all duration-200 rounded-md hover:-translate-y-0.5 hover:z-1"
-    :class="props.node.online ? 'card-surface hover:card-surface-lift' : 'card-surface-danger'"
+    class="node-card h-full w-full cursor-pointer border-none shadow-[0_0_0_1px] shadow-transparent transition-all duration-200 rounded-md bg-background/80 hover:bg-background hover:shadow-emerald-600/10 hover:shadow-[0_0_20px,0_0_0_1px] hover:-translate-y-0.5 hover:z-1"
+    :class="[pickSurfaceClass('', 'backdrop-blur-sm'), !props.node.online && 'shadow-[0_0_0_1px] !shadow-red-600/20']"
     @click="emit('click')"
   >
     <template #header>

@@ -41,17 +41,6 @@
   --chart-5: oklch(0.769 0.188 70.08);
   --radius: 0.625rem;
   --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  /* 卡片表面：轻玻璃（半透明 + 模糊 + 极淡描边 + 单层柔影） */
-  --surface-fill: color-mix(in oklab, var(--card) 72%, transparent);
-  --surface-fill-strong: color-mix(in oklab, var(--card) 88%, transparent);
-  --surface-fill-soft: color-mix(in oklab, var(--card) 56%, transparent);
-  --surface-ring: oklch(0.25 0.01 260 / 7%);
-  --surface-ring-hover: oklch(0.25 0.01 260 / 12%);
-  --surface-ring-danger: oklch(0.577 0.245 27.325 / 32%);
-  --surface-shadow-1: oklch(0.25 0.01 260 / 5%);
-  --surface-shadow-2: oklch(0.25 0.01 260 / 4%);
-  --surface-shadow-1-hover: oklch(0.25 0.01 260 / 8%);
-  --surface-shadow-2-hover: oklch(0.25 0.01 260 / 7%);
 }
 
 .dark {
@@ -85,17 +74,6 @@
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
-  /* 卡片表面：深色下提高不透明度，描边用白色低透明度 */
-  --surface-fill: color-mix(in oklab, var(--card) 80%, transparent);
-  --surface-fill-strong: color-mix(in oklab, var(--card) 92%, transparent);
-  --surface-fill-soft: color-mix(in oklab, var(--card) 64%, transparent);
-  --surface-ring: oklch(1 0 0 / 9%);
-  --surface-ring-hover: oklch(1 0 0 / 16%);
-  --surface-ring-danger: oklch(0.704 0.191 22.216 / 40%);
-  --surface-shadow-1: oklch(0 0 0 / 30%);
-  --surface-shadow-2: oklch(0 0 0 / 35%);
-  --surface-shadow-1-hover: oklch(0 0 0 / 40%);
-  --surface-shadow-2-hover: oklch(0 0 0 / 50%);
 }
 
 @theme inline {
@@ -173,79 +151,9 @@
   }
 }
 
-/* ============ 卡片表面：轻玻璃 ============ */
-/* 1px 描边用 box-shadow 画，不用 border，避免改变布局尺寸 */
-@utility card-surface {
-  background-color: var(--surface-fill);
-  backdrop-filter: blur(10px) saturate(140%);
-  box-shadow:
-    0 0 0 1px var(--surface-ring),
-    0 1px 2px var(--surface-shadow-1),
-    0 10px 24px -6px var(--surface-shadow-2);
-  transition: background-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+/* ============ 卡片描边 ============ */
+/* 刻意不放进 @layer：未分层的规则优先级高于 Tailwind 的 border-none，
+   这样组件里原有的 border-none 不用逐个删也能画出边框。 */
+.card-outline {
+  border: 1px solid var(--border);
 }
-
-@utility card-surface-lift {
-  background-color: var(--surface-fill-strong);
-  box-shadow:
-    0 0 0 1px var(--surface-ring-hover),
-    0 2px 4px var(--surface-shadow-1-hover),
-    0 14px 30px -8px var(--surface-shadow-2-hover);
-}
-
-/* 小尺寸（列表行、表头）：模糊更轻、只留一层，密集排列不糊成一片 */
-@utility card-surface-sm {
-  background-color: var(--surface-fill);
-  backdrop-filter: blur(6px) saturate(130%);
-  box-shadow:
-    0 0 0 1px var(--surface-ring),
-    0 1px 2px var(--surface-shadow-1);
-  transition: background-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
-}
-
-@utility card-surface-sm-lift {
-  background-color: var(--surface-fill-strong);
-  box-shadow:
-    0 0 0 1px var(--surface-ring-hover),
-    0 2px 6px var(--surface-shadow-1-hover);
-}
-
-/* 离线节点：描边转红，层次不变 */
-@utility card-surface-danger {
-  background-color: var(--surface-fill);
-  backdrop-filter: blur(10px) saturate(140%);
-  box-shadow:
-    0 0 0 1px var(--surface-ring-danger),
-    0 1px 2px var(--surface-shadow-1),
-    0 10px 24px -6px var(--surface-shadow-2);
-  transition: background-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
-}
-
-@utility card-surface-sm-danger {
-  background-color: var(--surface-fill);
-  backdrop-filter: blur(6px) saturate(130%);
-  box-shadow:
-    0 0 0 1px var(--surface-ring-danger),
-    0 1px 2px var(--surface-shadow-1);
-  transition: background-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
-}
-
-/* ============ 控件表面：分组胶囊、图标按钮、搜索框 ============ */
-@utility control-surface {
-  background-color: var(--surface-fill-soft);
-  backdrop-filter: blur(14px) saturate(150%);
-  box-shadow:
-    0 0 0 1px var(--surface-ring),
-    0 1px 2px var(--surface-shadow-1);
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-/* 选中态：更实一点，像一颗被按下的玻璃珠 */
-@utility control-surface-active {
-  background-color: var(--surface-fill-strong);
-  box-shadow:
-    0 0 0 1px var(--surface-ring),
-    0 1px 2px var(--surface-shadow-1),
-    0 4px 10px -4px var(--surface-shadow-2);
-}
-

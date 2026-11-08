@@ -6,6 +6,7 @@ import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import NodeEarthGlobe from '@/components/NodeEarthGlobe.vue'
 import { CardX } from '@/components/ui/card-x'
 import { DataTooltip } from '@/components/ui/data-tooltip'
+import { useBackgroundSurface } from '@/composables/useBackgroundSurface'
 import { useAppStore } from '@/stores/app'
 import { useNodesStore } from '@/stores/nodes'
 import * as financeHelper from '@/utils/financeHelper'
@@ -21,6 +22,7 @@ const props = defineProps<{
 const NodeEarthMaps = defineAsyncComponent(() => import('@/components/NodeEarthMaps.vue'))
 
 const appStore = useAppStore()
+const { pickSurfaceClass } = useBackgroundSurface()
 const nodesStore = useNodesStore()
 const exchangeRates = ref(financeHelper.DEFAULT_EXCHANGE_RATES)
 const exchangeRateBaseCurrency = ref<CurrencyCode>('CNY')
@@ -195,7 +197,7 @@ onMounted(async () => {
         hoverable
         class="group h-full border-none rounded-md transition-all"
         :class="[
-          'card-surface hover:card-surface-lift',
+          pickSurfaceClass('bg-background/60 hover:bg-background', 'bg-background/50 hover:bg-background backdrop-blur-xs'),
           metricSlots.memory,
         ]"
         content-class="h-full !p-3"
@@ -227,7 +229,7 @@ onMounted(async () => {
         hoverable
         class="group h-full border-none rounded-md transition-all"
         :class="[
-          'card-surface hover:card-surface-lift',
+          pickSurfaceClass('bg-background/60 hover:bg-background', 'bg-background/50 hover:bg-background backdrop-blur-xs'),
           metricSlots.disk,
         ]"
         content-class="h-full !p-3"
@@ -262,7 +264,7 @@ onMounted(async () => {
         <CardX
           hoverable
           class="group h-full border-none rounded-md transition-all"
-          :class="'card-surface hover:card-surface-lift'"
+          :class="pickSurfaceClass('bg-background/60 hover:bg-background', 'bg-background/50 hover:bg-background backdrop-blur-xs')"
           content-class="h-full !p-3" @click="openFinanceCard = !openFinanceCard"
         >
           <div class="flex h-full flex-col justify-between gap-1">
@@ -292,7 +294,7 @@ onMounted(async () => {
           hoverable
           class="absolute top-0 left-1/2 z-20 h-42 w-[260%] max-w-88 -translate-x-[50%] -translate-y-[25%] rounded-md border-none shadow-[0_0_20px,0_0_0_1px] shadow-emerald-600/10 transition-all"
           :class="[
-            'card-surface',
+            pickSurfaceClass('bg-background', 'bg-background/50 backdrop-blur-lg'),
             openFinanceCard ? 'opacity-100 scale-100  -translate-y-[5%]' : 'opacity-0 pointer-events-none scale-50',
           ]"
           content-class="h-full !p-4" @click="openFinanceCard = false"
@@ -360,7 +362,7 @@ onMounted(async () => {
         hoverable
         class="group h-full border-none rounded-md transition-all"
         :class="[
-          'card-surface hover:card-surface-lift',
+          pickSurfaceClass('bg-background/60 hover:bg-background', 'bg-background/50 hover:bg-background backdrop-blur-xs'),
           metricSlots.traffic,
         ]"
         content-class="h-full !p-3"
@@ -399,7 +401,7 @@ onMounted(async () => {
         hoverable
         class="group h-full border-none rounded-md transition-all"
         :class="[
-          'card-surface hover:card-surface-lift',
+          pickSurfaceClass('bg-background/60 hover:bg-background', 'bg-background/50 hover:bg-background backdrop-blur-xs'),
           metricSlots.speedUp,
         ]"
         content-class="h-full !p-3"
@@ -428,7 +430,7 @@ onMounted(async () => {
         hoverable
         class="group h-full border-none rounded-md transition-all"
         :class="[
-          'card-surface hover:card-surface-lift',
+          pickSurfaceClass('bg-background/60 hover:bg-background', 'bg-background/50 hover:bg-background backdrop-blur-xs'),
           metricSlots.speedDown,
         ]"
         content-class="h-full !p-3"
