@@ -227,7 +227,7 @@ function getRowTransitionStyle(index: number): Record<string, string> {
                 <div class="flex flex-wrap gap-1 items-center">
                   <Badge
                     v-for="(tag, tagIndex) in getCustomTags(node)" :key="tagIndex" variant="outline"
-                    class="!text-[11px] rounded border-transparent px-1.5 bg-slate-500/10 text-slate-600 dark:bg-slate-400/15 dark:text-slate-300"
+                    class="!text-[11px] rounded border-transparent px-1.5 bg-emerald-600/10 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400"
                   >
                     {{ tag }}
                   </Badge>
