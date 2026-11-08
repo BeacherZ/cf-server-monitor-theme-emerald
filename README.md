@@ -11,7 +11,7 @@
 ### 1. 探针后台要填的地址
 
 ```
-https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/5e833abba11c9928f9881a560cc8ec130a55ae68
+https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/60d000c923dc03ee138fb5f3ee5de5e3d6bc5568
 ```
 
 填写位置：CF Server Monitor 后台 → 设置 → 主题 → 「自定义主题 URL」→ 粘贴 → 预览 → 启用自定义 → 保存。
@@ -30,7 +30,7 @@ https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/5e833abba11c992
 | 4 | `NodeCard.vue`<br>`utils/tagHelper.ts` | 卡片标签行右端新增 `V4` / `V6` 徽章。后端 `/api/servers` 的 `ip_v4` / `ip_v6` 是标志位（`"1"` 有、`"0"` 无）而不是 IP，所以只显示实例实际具备的协议栈 |
 | 5 | `NodeCard.vue` | 卡片常驻 emerald 光晕（上游只有 hover 才有），hover 时额外一圈细亮边并上浮 0.5px；离线卡片常驻红色光晕 |
 | 6 | `CardX.vue`<br>`NodeList.vue`<br>`PingChart.vue`<br>`styles/main.css` | 所有卡片不画描边（`bordered` 默认关闭，`.card-outline` 已删除），只靠底色、圆角和光晕区分 |
-| 7 | `NodeCard.vue`<br>`NodeList.vue`<br>`utils/helper.ts` | CPU / 内存 / 硬盘 / 流量的百分比数值正常时不染色（用正文色，靠字重区分层级），`≥60` 转橙、`≥85` 转红，与进度条同一套阈值 —— 颜色只在异常时出现，绿色集中在进度条、三网和方块上；备注标签在卡片与列表里统一为淡绿底 + `emerald-600` 字（与导航栏选中项同色），`V4` / `V6` 淡蓝 / 淡紫底；速率、在线、费用、三网、延迟丢包各行保持原样 |
+| 7 | `NodeCard.vue`<br>`NodeList.vue`<br>`utils/helper.ts` | CPU / 内存 / 硬盘 / 流量的百分比数值正常时不染色（用正文色，靠字重区分层级），`≥60` 转橙、`≥85` 转红，与进度条同一套阈值 —— 颜色只在异常时出现，绿色集中在进度条、三网和方块上；备注标签与 `V4` / `V6` 统一为空心描边（无底色），字色分别是 `emerald-600`（与导航栏选中项同色）、蓝、紫；速率、在线、费用、三网、延迟丢包各行保持原样 |
 
 ---
 
