@@ -160,7 +160,7 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
     </div>
 
     <div v-if="appStore.alertEnabled && appStore.alertContent" class="alert px-4">
-      <Alert :class="pickSurfaceClass('border-none bg-background rounded-md', 'border-none bg-background/60 backdrop-blur-xs rounded-md')">
+      <Alert :class="'card-surface border-none rounded-md'">
         <AlertTitle v-if="appStore.alertTitle">
           {{ appStore.alertTitle }}
         </AlertTitle>

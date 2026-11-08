@@ -864,7 +864,7 @@ onMounted(() => {
         <CardX
           size="small"
           class="border-none transition-all rounded-md"
-          :class="pickSurfaceClass('bg-background/60 hover:bg-background', 'bg-background/50 hover:bg-background backdrop-blur-xs')"
+          :class="'card-surface'"
         >
           <template #header>
             <div class="flex items-center justify-between">
@@ -885,7 +885,7 @@ onMounted(() => {
         <CardX
           size="small"
           class="border-none transition-all rounded-md"
-          :class="pickSurfaceClass('bg-background/60 hover:bg-background', 'bg-background/50 hover:bg-background backdrop-blur-xs')"
+          :class="'card-surface'"
         >
           <template #header>
             <div class="flex items-center justify-between">
@@ -915,7 +915,7 @@ onMounted(() => {
         <CardX
           size="small"
           class="border-none transition-all rounded-md"
-          :class="pickSurfaceClass('bg-background/60 hover:bg-background', 'bg-background/50 hover:bg-background backdrop-blur-xs')"
+          :class="'card-surface'"
         >
           <template #header>
             <div class="flex items-center justify-between">
@@ -944,7 +944,7 @@ onMounted(() => {
         <CardX
           size="small"
           class="border-none transition-all rounded-md"
-          :class="pickSurfaceClass('bg-background/60 hover:bg-background', 'bg-background/50 hover:bg-background backdrop-blur-xs')"
+          :class="'card-surface'"
         >
           <template #header>
             <div class="flex items-center justify-between">
@@ -978,7 +978,7 @@ onMounted(() => {
         <CardX
           size="small"
           class="border-none transition-all rounded-md"
-          :class="pickSurfaceClass('bg-background/60 hover:bg-background', 'bg-background/50 hover:bg-background backdrop-blur-xs')"
+          :class="'card-surface'"
         >
           <template #header>
             <div class="flex items-center justify-between">
@@ -999,7 +999,7 @@ onMounted(() => {
         <CardX
           size="small"
           class="border-none transition-all rounded-md"
-          :class="pickSurfaceClass('bg-background/60 hover:bg-background', 'bg-background/50 hover:bg-background backdrop-blur-xs')"
+          :class="'card-surface'"
         >
           <template #header>
             <div class="flex items-center justify-between">

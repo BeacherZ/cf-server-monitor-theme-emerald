@@ -862,7 +862,7 @@ onMounted(() => {
         >
           <div
             v-for="task in latestValues" :key="task.id"
-            class="flex cursor-pointer select-none items-center gap-3 rounded-md p-2 transition-all bg-background/60 hover:bg-background hover:shadow-[0_0_0_1px] hover:shadow-emerald-600/10"
+            class="flex cursor-pointer select-none items-center gap-3 rounded-md p-2 transition-all card-surface-sm hover:card-surface-sm-lift"
             :class="[
               !selectedTaskIds.includes(task.id) && 'opacity-30',
             ]"
@@ -980,7 +980,7 @@ onMounted(() => {
         <!-- 图表 -->
         <div
           class="h-80 rounded-md p-4 transition-all"
-          :class="pickSurfaceClass('bg-background/60 hover:bg-background', 'bg-background/50 hover:bg-background backdrop-blur-xl')"
+          :class="'card-surface'"
         >
           <VChart :option="pingChartOption" autoresize />
         </div>

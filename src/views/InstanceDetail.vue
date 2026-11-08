@@ -7,7 +7,6 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { CardX } from '@/components/ui/card-x'
 import { Empty } from '@/components/ui/empty'
-import { useBackgroundSurface } from '@/composables/useBackgroundSurface'
 import { useAppStore } from '@/stores/app'
 import { useNodesStore } from '@/stores/nodes'
 import { getApiAssetUrl } from '@/utils/api'
@@ -44,7 +43,6 @@ const route = useRoute()
 const router = useRouter()
 
 const appStore = useAppStore()
-const { pickSurfaceClass } = useBackgroundSurface()
 const nodesStore = useNodesStore()
 const exchangeRates = ref(financeHelper.DEFAULT_EXCHANGE_RATES)
 const financeBaseCurrency = ref<CurrencyCode>('CNY')
@@ -289,7 +287,7 @@ const trafficProgressStyle = computed(() => ({
     <div v-if="!data" class="p-4">
       <CardX
         class="border-none transition-all rounded-md"
-        :class="pickSurfaceClass('bg-background/60 hover:bg-background', 'bg-background/50 hover:bg-background backdrop-blur-xs')"
+        :class="'card-surface'"
       >
         <Empty description="节点不存在或已被删除">
           <template #extra>
@@ -322,7 +320,7 @@ const trafficProgressStyle = computed(() => ({
         <CardX
           v-for="item in metricCards" :key="item.label" hoverable size="small"
           class="group h-full border-none transition-all rounded-md"
-          :class="pickSurfaceClass('bg-background/60 hover:bg-background', 'bg-background/50 hover:bg-background backdrop-blur-xs')"
+          :class="'card-surface'"
           content-class="h-full !p-3"
         >
           <div class="flex h-full min-h-10 md:min-h-18 flex-col justify-between gap-3">
@@ -352,7 +350,7 @@ const trafficProgressStyle = computed(() => ({
         <CardX
           title="硬件信息" size="small"
           class="group h-full border-none transition-all rounded-md"
-          :class="pickSurfaceClass('bg-background/60 hover:bg-background', 'bg-background/50 hover:bg-background backdrop-blur-xs')"
+          :class="'card-surface'"
         >
           <div class="gap-3 grid grid-cols-3">
             <div
@@ -371,7 +369,7 @@ const trafficProgressStyle = computed(() => ({
         <CardX
           title="系统信息" size="small"
           class="group h-full border-none transition-all rounded-md"
-          :class="pickSurfaceClass('bg-background/60 hover:bg-background', 'bg-background/50 hover:bg-background backdrop-blur-xs')"
+          :class="'card-surface'"
         >
           <div class="gap-3 grid grid-cols-1 sm:grid-cols-2">
             <div
@@ -398,7 +396,7 @@ const trafficProgressStyle = computed(() => ({
         <CardX
           title="存储信息" size="small"
           class="group h-full border-none transition-all rounded-md"
-          :class="pickSurfaceClass('bg-background/60 hover:bg-background', 'bg-background/50 hover:bg-background backdrop-blur-xs')"
+          :class="'card-surface'"
         >
           <div class="gap-3 grid grid-cols-3">
             <div
@@ -417,7 +415,7 @@ const trafficProgressStyle = computed(() => ({
         <CardX
           title="网络信息" size="small"
           class="group h-full border-none transition-all rounded-md"
-          :class="pickSurfaceClass('bg-background/60 hover:bg-background', 'bg-background/50 hover:bg-background backdrop-blur-xs')"
+          :class="'card-surface'"
           content-class="pt-0"
         >
           <div class="gap-3 grid grid-cols-2">

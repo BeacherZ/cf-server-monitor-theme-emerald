@@ -41,6 +41,14 @@
   --chart-5: oklch(0.769 0.188 70.08);
   --radius: 0.625rem;
   --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* 卡片表面：描边 + 柔和投影（浅色） */
+  --surface-ring: oklch(0.902 0.004 286.32);
+  --surface-ring-hover: oklch(0.84 0.006 286.32);
+  --surface-ring-danger: oklch(0.577 0.245 27.325 / 50%);
+  --surface-shadow-1: oklch(0.25 0.01 260 / 5%);
+  --surface-shadow-2: oklch(0.25 0.01 260 / 7%);
+  --surface-shadow-1-hover: oklch(0.25 0.01 260 / 7%);
+  --surface-shadow-2-hover: oklch(0.25 0.01 260 / 10%);
 }
 
 .dark {
@@ -74,6 +82,14 @@
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
+  /* 卡片表面：深色下用白色描边 + 更重投影，保证层次 */
+  --surface-ring: oklch(1 0 0 / 10%);
+  --surface-ring-hover: oklch(1 0 0 / 18%);
+  --surface-ring-danger: oklch(0.704 0.191 22.216 / 55%);
+  --surface-shadow-1: oklch(0 0 0 / 30%);
+  --surface-shadow-2: oklch(0 0 0 / 40%);
+  --surface-shadow-1-hover: oklch(0 0 0 / 40%);
+  --surface-shadow-2-hover: oklch(0 0 0 / 55%);
 }
 
 @theme inline {
@@ -149,4 +165,55 @@
     align-items: center;
     justify-content: center;
   }
+}
+
+/* ============ 卡片表面（浅色/深色通用） ============ */
+/* 单独用 box-shadow 画 1px 描边，避免 border 改变布局尺寸 */
+@utility card-surface {
+  background-color: var(--card);
+  box-shadow:
+    0 0 0 1px var(--surface-ring),
+    0 1px 2px var(--surface-shadow-1),
+    0 8px 20px var(--surface-shadow-2);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+@utility card-surface-lift {
+  box-shadow:
+    0 0 0 1px var(--surface-ring-hover),
+    0 2px 4px var(--surface-shadow-1-hover),
+    0 12px 28px var(--surface-shadow-2-hover);
+}
+
+/* 小尺寸（列表行、表头）：只用最轻的一层，避免密集排列时投影糊成一片 */
+@utility card-surface-sm {
+  background-color: var(--card);
+  box-shadow:
+    0 0 0 1px var(--surface-ring),
+    0 1px 2px var(--surface-shadow-1);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+@utility card-surface-sm-lift {
+  box-shadow:
+    0 0 0 1px var(--surface-ring-hover),
+    0 2px 6px var(--surface-shadow-1-hover);
+}
+
+/* 离线节点：描边转红，层次不变 */
+@utility card-surface-danger {
+  background-color: var(--card);
+  box-shadow:
+    0 0 0 1px var(--surface-ring-danger),
+    0 1px 2px var(--surface-shadow-1),
+    0 8px 20px var(--surface-shadow-2);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+@utility card-surface-sm-danger {
+  background-color: var(--card);
+  box-shadow:
+    0 0 0 1px var(--surface-ring-danger),
+    0 1px 2px var(--surface-shadow-1);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
