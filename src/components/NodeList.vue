@@ -14,6 +14,7 @@ import { formatBytesPerSecondWithConfig, formatBytesWithConfig, formatUptimeWith
 import { formatOfflineTime, getCustomTags, getPriceTags, getRemainingTimeTagClass, getTrafficUsed, getTrafficUsedPercentage, hasRegion, showTrafficProgress } from '@/utils/nodeHelper'
 import { getOSImage, getOSName } from '@/utils/osImageHelper'
 import { getRegionCode, getRegionDisplayName } from '@/utils/regionHelper'
+import { hasIPv4, hasIPv6 } from '@/utils/tagHelper'
 
 interface ColumnConfig {
   key: string
@@ -45,7 +46,8 @@ const columns: ColumnConfig[] = [
   { key: 'status', label: '状态', width: '40px', sortable: true },
   { key: 'os', label: '系统', width: '40px', sortable: true },
   { key: 'name', label: '节点', width: 'minmax(150px, 0.8fr)', sortable: true },
-  { key: 'tags', label: '标签', width: 'minmax(180px, 1fr)', sortable: false },
+  { key: 'tags', label: '标签', width: 'minmax(140px, 1fr)', sortable: false },
+  { key: 'stack', label: '双栈', width: '76px', sortable: false },
   { key: 'cpu', label: 'CPU', width: '100px', sortable: true },
   { key: 'mem', label: '内存', width: '100px', sortable: true },
   { key: 'disk', label: '硬盘', width: '100px', sortable: true },
@@ -53,6 +55,16 @@ const columns: ColumnConfig[] = [
   { key: 'rate', label: '速率', width: '80px', sortable: true },
   { key: 'latency', label: '延迟', width: '136px', sortable: false },
 ]
+
+// 实例支持的协议栈：只显示探针实际上报了的地址族
+function stackBadges(node: NodeData) {
+  const badges: string[] = []
+  if (hasIPv4(node.ipv4))
+    badges.push('V4')
+  if (hasIPv6(node.ipv6))
+    badges.push('V6')
+  return badges
+}
 
 const sortKey = ref<string>('')
 const sortDir = ref<1 | -1>(1)
@@ -232,6 +244,19 @@ function getRowTransitionStyle(index: number): Record<string, string> {
                     {{ tag }}
                   </Badge>
                 </div>
+              </div>
+
+              <!-- 协议栈 -->
+              <div v-else-if="col.key === 'stack'" class="flex items-center gap-1">
+                <template v-if="stackBadges(node).length > 0">
+                  <Badge
+                    v-for="badge in stackBadges(node)" :key="badge" variant="outline"
+                    class="!text-[11px] rounded border-border px-1.5 tabular-nums text-muted-foreground"
+                  >
+                    {{ badge }}
+                  </Badge>
+                </template>
+                <span v-else class="text-[11px] text-muted-foreground/40">—</span>
               </div>
 
               <!-- 三网和 BGP 实时延迟 -->
