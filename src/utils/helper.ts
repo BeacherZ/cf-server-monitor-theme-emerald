@@ -252,10 +252,10 @@ export function calcPercentage(used: number, total: number): number {
   return (used / total) * 100
 }
 
-/** 状态阈值配置 */
+/** 状态阈值配置：<50 正常、50–85 警告、≥85 危险 */
 const STATUS_THRESHOLDS = {
-  success: 60,
-  warning: 80,
+  success: 50,
+  warning: 85,
 } as const
 
 /**
