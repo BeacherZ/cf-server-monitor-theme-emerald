@@ -27,7 +27,7 @@ https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/dd9686190c3b2b9
 | 1 | `NodeEarthGlobe.vue` | 去掉地球上的蓝色连线弧，其余地球表现与上游一致 |
 | 2 | `VisitorInfoCard.vue` | 访客信息条改为自动隐藏：数据就绪直接显示（不淡入），8 秒后 1 秒淡出；只有真实鼠标悬停才暂停计时，展开/收起都重新计 8 秒 |
 | 3 | `utils/tagHelper.ts` | 计费周期中文化：`Y→年`、`M→月`、`Q→季`、`D→天`（英文界面不变） |
-| 4 | `NodeCard.vue`<br>`utils/tagHelper.ts` | 卡片标签行右端新增 `V4` / `V6` 徽章。后端 `/api/servers` 的 `ip_v4` / `ip_v6` 是标志位（`"1"` 有、`"0"` 无）而不是 IP，所以只显示实际具备的协议栈；访客态后端一律下发 `"0"`，那时不显示属正常 |
+| 4 | `NodeCard.vue`<br>`utils/tagHelper.ts` | 卡片标签行右端新增 `V4` / `V6` 徽章。后端 `/api/servers` 的 `ip_v4` / `ip_v6` 是标志位（`"1"` 有、`"0"` 无）而不是 IP，所以只显示实例实际具备的协议栈 |
 | 5 | `NodeCard.vue` | 卡片常驻 emerald 光晕（上游只有 hover 才有），hover 时额外一圈细亮边并上浮 0.5px；离线卡片常驻红色光晕 |
 | 6 | `CardX.vue`<br>`NodeList.vue`<br>`PingChart.vue`<br>`styles/main.css` | 所有卡片不画描边（`bordered` 默认关闭，`.card-outline` 已删除），只靠底色、圆角和光晕区分 |
 
