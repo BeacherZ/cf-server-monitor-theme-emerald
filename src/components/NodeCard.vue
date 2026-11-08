@@ -353,7 +353,7 @@ function openPingDialog() {
           <div class="min-w-0 flex flex-wrap gap-1 items-center">
             <Badge
               v-for="(tag, index) in customTags" :key="index" variant="outline"
-              class="!text-[11px] rounded border-emerald-600/30 px-1.5 text-emerald-600 dark:border-emerald-500/30 dark:text-emerald-400"
+              class="!text-[11px] rounded border-border px-1.5 text-muted-foreground"
             >
               {{ tag }}
             </Badge>
@@ -361,10 +361,7 @@ function openPingDialog() {
           <div v-if="ipStackBadges.length > 0" class="shrink-0 flex gap-1 items-center">
             <Badge
               v-for="badge in ipStackBadges" :key="badge" variant="outline"
-              class="!text-[11px] rounded px-1.5 tabular-nums"
-              :class="badge === 'V4'
-                ? 'border-blue-600/30 text-blue-600 dark:border-blue-400/40 dark:text-blue-400'
-                : 'border-violet-600/30 text-violet-600 dark:border-violet-400/40 dark:text-violet-400'"
+              class="!text-[11px] rounded border-border px-1.5 tabular-nums text-muted-foreground"
             >
               {{ badge }}
             </Badge>
