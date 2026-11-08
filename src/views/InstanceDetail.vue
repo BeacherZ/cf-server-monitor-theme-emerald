@@ -301,7 +301,7 @@ const trafficProgressStyle = computed(() => ({
 
     <template v-else>
       <div class="px-4 flex gap-4 items-center">
-        <Button variant="ghost" size="icon-sm" class="bg-background/50 hover:bg-background" @click="router.push('/')">
+        <Button variant="glass" size="icon-sm" class="control-surface hover:control-surface-active" @click="router.push('/')">
           <Icon icon="tabler:arrow-left" :width="16" :height="16" />
         </Button>
         <div class="text-lg font-bold flex gap-2 items-center">

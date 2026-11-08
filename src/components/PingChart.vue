@@ -817,7 +817,7 @@ onMounted(() => {
     <!-- 时间选择器 -->
     <Tabs v-model="selectedView" class="w-full items-center">
       <div class="min-w-0 flex-1 overflow-x-auto pointer-events-auto">
-        <TabsList :class="pickSurfaceClass('w-max h-8 bg-background/60 rounded-md', 'w-max h-8 bg-background/50 backdrop-blur-xl rounded-md')">
+        <TabsList class="w-max h-8 rounded-md control-surface">
           <TabsTrigger
             v-for="view in availableViews" :key="view.label" :value="view.label"
             class="h-6.5 flex-none shrink-0 text-xs border-none data-[state=active]:text-emerald-600 shadow-none rounded-sm"
@@ -829,15 +829,15 @@ onMounted(() => {
       <div class="md:flex-1" />
       <div class="flex gap-2 items-center">
         <Button
-          variant="ghost" size="xs" class="h-7 rounded-sm border-none bg-background/60 hover:bg-background"
-          :class="[selectedTaskIds.length === tasks.length && 'bg-background !text-emerald-600']"
+          variant="glass" size="xs" class="h-7 rounded-sm control-surface hover:control-surface-active"
+          :class="[selectedTaskIds.length === tasks.length && 'control-surface-active !text-emerald-600']"
           @click="showAllTasks"
         >
           全选
         </Button>
         <Button
-          variant="ghost" size="xs" class="h-7 rounded-sm border-none bg-background/60 hover:bg-background"
-          :class="[!selectedTaskIds.length && 'bg-background !text-emerald-600']"
+          variant="glass" size="xs" class="h-7 rounded-sm control-surface hover:control-surface-active"
+          :class="[!selectedTaskIds.length && 'control-surface-active !text-emerald-600']"
           @click="hideAllTasks"
         >
           全不选
@@ -945,23 +945,23 @@ onMounted(() => {
         <div class="flex flex-wrap gap-2 items-center py-2">
           <!-- 延迟可视化开关 -->
           <Button
-            variant="ghost" size="xs" class="h-7 rounded-sm border-none bg-background/60 hover:bg-background"
-            :class="[showDelay && 'bg-background !text-emerald-600']" @click="showDelay = !showDelay"
+            variant="glass" size="xs" class="h-7 rounded-sm control-surface hover:control-surface-active"
+            :class="[showDelay && 'control-surface-active !text-emerald-600']" @click="showDelay = !showDelay"
           >
             延迟
           </Button>
           <!-- 丢包可视化开关 -->
           <Button
-            variant="ghost" size="xs" class="h-7 rounded-sm border-none bg-background/60 hover:bg-background"
-            :class="[showLoss && 'bg-background !text-emerald-600']" @click="showLoss = !showLoss"
+            variant="glass" size="xs" class="h-7 rounded-sm control-surface hover:control-surface-active"
+            :class="[showLoss && 'control-surface-active !text-emerald-600']" @click="showLoss = !showLoss"
           >
             丢包
           </Button>
           <!-- 平滑峰值开关 -->
           <div class="flex gap-2 items-center">
             <Button
-              variant="ghost" size="xs" class="h-7 rounded-sm border-none bg-background/60 hover:bg-background"
-              :class="[cutPeak && 'bg-background !text-emerald-600']" @click="cutPeak = !cutPeak"
+              variant="glass" size="xs" class="h-7 rounded-sm control-surface hover:control-surface-active"
+              :class="[cutPeak && 'control-surface-active !text-emerald-600']" @click="cutPeak = !cutPeak"
             >
               平滑峰值
             </Button>

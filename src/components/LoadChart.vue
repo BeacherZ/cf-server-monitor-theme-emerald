@@ -10,7 +10,6 @@ import { CardX } from '@/components/ui/card-x'
 import { Empty } from '@/components/ui/empty'
 import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useBackgroundSurface } from '@/composables/useBackgroundSurface'
 import { getGuestMaxChartTimeRangeLabel, requiresLongHistoryLogin, showLongHistoryLoginPrompt } from '@/composables/useLongHistoryAuth'
 import { useAppStore } from '@/stores/app'
 import { useNodesStore } from '@/stores/nodes'
@@ -25,7 +24,6 @@ const props = defineProps<{
 }>()
 
 const appStore = useAppStore()
-const { pickSurfaceClass } = useBackgroundSurface()
 const nodesStore = useNodesStore()
 
 // 从 publicSettings 获取记录保留时间
@@ -839,7 +837,7 @@ onMounted(() => {
     <LongHistoryLoginDialog />
     <!-- 时间选择器 -->
     <Tabs v-model="selectedView" class="w-full items-center">
-      <TabsList :class="pickSurfaceClass('h-8 bg-background/60 pointer-events-auto rounded-md', 'h-8 bg-background/50 backdrop-blur-xl pointer-events-auto rounded-md')">
+      <TabsList class="h-8 pointer-events-auto rounded-md control-surface">
         <TabsTrigger
           v-for="view in availableViews" :key="view.label" :value="view.label"
           class="h-6.5 text-xs border-none data-[state=active]:text-emerald-600 shadow-none rounded-sm"

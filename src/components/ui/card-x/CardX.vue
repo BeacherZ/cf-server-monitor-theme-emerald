@@ -61,7 +61,7 @@ const segmentedFooter = computed(() => {
 <template>
   <div
     :class="cn(
-      'bg-card text-card-foreground flex flex-col rounded-lg',
+      'text-card-foreground flex flex-col rounded-lg',
       bordered && 'border',
       hoverable && 'transition-colors hover:border-foreground/30',
       props.class,
