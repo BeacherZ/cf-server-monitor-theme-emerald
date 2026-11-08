@@ -11,7 +11,7 @@
 ### 1. 探针后台要填的地址
 
 ```
-https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/3b3e5b9051af9a5996c0865d5839b339258eff68
+https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/dd9686190c3b2b991ef9df3a06ce5ea0d2e0ce68
 ```
 
 填写位置：CF Server Monitor 后台 → 设置 → 主题 → 「自定义主题 URL」→ 粘贴 → 预览 → 启用自定义 → 保存。
@@ -24,7 +24,7 @@ https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/3b3e5b9051af9a5
 
 | # | 文件 | 改了什么 |
 | :-- | :-- | :-- |
-| 1 | `NodeEarthGlobe.vue` | 地球保留各地区到访客位置的蓝色汇聚弧线，但剔除「访客所在国连向自己」的自环弧（两端坐标相同会被 cobe 渲染成一根竖起的刺）；访客位置本身改为一颗跳动的绿色脉冲点，其余地球表现与上游一致 |
+| 1 | `NodeEarthGlobe.vue` | 去掉地球上的蓝色连线弧，其余地球表现与上游一致 |
 | 2 | `VisitorInfoCard.vue` | 访客信息条改为自动隐藏：数据就绪直接显示（不淡入），8 秒后 1 秒淡出；只有真实鼠标悬停才暂停计时，展开/收起都重新计 8 秒 |
 | 3 | `utils/tagHelper.ts` | 计费周期中文化：`Y→年`、`M→月`、`Q→季`、`D→天`（英文界面不变） |
 | 4 | `NodeCard.vue`<br>`utils/tagHelper.ts` | 卡片标签行右端新增 `V4` / `V6` 徽章。后端 `/api/servers` 的 `ip_v4` / `ip_v6` 是标志位（`"1"` 有、`"0"` 无）而不是 IP，所以只显示实例实际具备的协议栈 |

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Arc, COBEOptions, Globe, Marker } from 'cobe'
+import type { COBEOptions, Globe, Marker } from 'cobe'
 import type { ComponentPublicInstance } from 'vue'
 import type { NodeData } from '@/stores/nodes'
 import { Icon } from '@iconify/vue'
@@ -153,16 +153,6 @@ const regionRates = computed<Map<string, RegionRate>>(() => {
   return map
 })
 
-// 访客所在坐标：只在开启访客信息卡且已解析出国家码时存在
-const visitorCoord = computed<[number, number] | null>(() => {
-  if (!appStore.visitorInfoCardEnabled)
-    return null
-  const code = appStore.visitorCountryCode
-  if (!code)
-    return null
-  return getCoordByCode(code)
-})
-
 const clusterOverlayEls = new Map<string, HTMLDivElement>()
 const clusterOverlayRefBinders = new Map<string, (el: Element | ComponentPublicInstance | null) => void>()
 
@@ -185,10 +175,13 @@ function getRenderSize() {
 
 // iOS Safari 对 cobe 内部 marker anchor 的 DOM/style 行为不稳定，
 // overlay 改为组件内自行投影定位，避免回落到容器左上角。
-function projectCoord(coord: [number, number]) {
+function syncClusterOverlayPosition(cluster: RegionCluster, el: HTMLDivElement) {
   const { width, height } = getRenderSize()
-  if (width <= 0 || height <= 0)
-    return null
+  if (width <= 0 || height <= 0) {
+    el.style.opacity = '0'
+    el.style.filter = 'blur(20px)'
+    return
+  }
 
   const aspect = width / height
   const cosTheta = Math.cos(theta)
@@ -197,7 +190,7 @@ function projectCoord(coord: [number, number]) {
   const sinPhi = Math.sin(phi)
   const markerRadius = GLOBE_RADIUS + MARKER_ELEVATION
   const visibleThreshold = GLOBE_RADIUS * GLOBE_RADIUS
-  const [baseX, baseY, baseZ] = coordToGlobePoint(coord)
+  const [baseX, baseY, baseZ] = coordToGlobePoint(cluster.coord)
   const x = baseX * markerRadius
   const y = baseY * markerRadius
   const z = baseZ * markerRadius
@@ -209,20 +202,10 @@ function projectCoord(coord: [number, number]) {
   )
   const xPx = ((screenX / aspect) * GLOBE_SCALE + 1) * width / 2
   const yPx = ((-screenY) * GLOBE_SCALE + 1) * height / 2
-  return { x: xPx, y: yPx, visible }
-}
 
-function syncClusterOverlayPosition(cluster: RegionCluster, el: HTMLDivElement) {
-  const point = projectCoord(cluster.coord)
-  if (!point) {
-    el.style.opacity = '0'
-    el.style.filter = 'blur(20px)'
-    return
-  }
-
-  el.style.transform = `translate3d(${point.x}px, ${point.y}px, 0)`
-  el.style.opacity = point.visible ? '1' : '0'
-  el.style.filter = point.visible ? 'blur(0px)' : 'blur(20px)'
+  el.style.transform = `translate3d(${xPx}px, ${yPx}px, 0)`
+  el.style.opacity = visible ? '1' : '0'
+  el.style.filter = visible ? 'blur(0px)' : 'blur(20px)'
 }
 
 function syncClusterOverlayPositions() {
@@ -232,27 +215,6 @@ function syncClusterOverlayPositions() {
       continue
     syncClusterOverlayPosition(cluster, el)
   }
-  syncVisitorDot()
-}
-
-const visitorDotRef = ref<HTMLDivElement>()
-
-function syncVisitorDot() {
-  const el = visitorDotRef.value
-  if (!el)
-    return
-  const coord = visitorCoord.value
-  if (!coord) {
-    el.style.opacity = '0'
-    return
-  }
-  const point = projectCoord(coord)
-  if (!point) {
-    el.style.opacity = '0'
-    return
-  }
-  el.style.transform = `translate3d(${point.x}px, ${point.y}px, 0)`
-  el.style.opacity = point.visible ? '1' : '0'
 }
 
 function setClusterOverlayEl(code: string, el: Element | ComponentPublicInstance | null) {
@@ -291,18 +253,7 @@ const markers = computed<Marker[]>(() => {
   }))
 })
 
-// 各地区 -> 访客坐标的汇聚弧线。
-// 起点与终点重合（访客所在国自身）会形成零长度弧，cobe 把它顶成一根竖起的刺，这里剔除自环。
-const arcs = computed<Arc[]>(() => {
-  const user = visitorCoord.value
-  if (!user)
-    return []
-  const visitorCode = appStore.visitorCountryCode
-  return regionClusters.value
-    .filter(cluster => cluster.code !== visitorCode)
-    .map(cluster => ({ from: cluster.coord, to: user }))
-})
-
+// 蓝色连线弧已移除，仅保留地区标记
 const themeColors = computed(() => {
   if (appStore.isDark) {
     return {
@@ -311,7 +262,6 @@ const themeColors = computed(() => {
       baseColor: [0.32, 0.33, 0.4] as [number, number, number],
       markerColor: [0.4, 0.7, 1.0] as [number, number, number],
       glowColor: [0.2, 0.25, 0.45] as [number, number, number],
-      arcColor: [0.45, 0.75, 1.0] as [number, number, number],
     }
   }
   return {
@@ -320,7 +270,6 @@ const themeColors = computed(() => {
     baseColor: [1, 1, 1] as [number, number, number],
     markerColor: [0.21, 0.51, 0.93] as [number, number, number],
     glowColor: [1, 1, 1] as [number, number, number],
-    arcColor: [0.21, 0.51, 0.93] as [number, number, number],
   }
 })
 
@@ -341,10 +290,6 @@ function buildInitialOptions(): COBEOptions {
     markerColor: colors.markerColor,
     glowColor: colors.glowColor,
     markers: markers.value,
-    arcs: arcs.value,
-    arcColor: colors.arcColor,
-    arcWidth: 0.8,
-    arcHeight: 0.4,
     markerElevation: MARKER_ELEVATION,
   }
 }
@@ -467,11 +412,11 @@ watch(
 )
 
 watch(
-  [() => regionClusters.value.map(clusterKey).join(','), visitorCoord],
+  () => regionClusters.value.map(clusterKey).join(','),
   async () => {
     if (!globe)
       return
-    globe.update({ markers: markers.value, arcs: arcs.value })
+    globe.update({ markers: markers.value })
     await nextTick()
     syncClusterOverlayPositions()
     if (!shouldAutoRotate.value)
@@ -533,17 +478,6 @@ function formatRate(bytesPerSec: number): string {
       @pointerdown="onPointerDown" @pointermove="onPointerMove" @pointerup="onPointerUp" @pointercancel="onPointerUp"
     />
 
-    <div
-      ref="visitorDotRef"
-      class="absolute left-0 top-0 pointer-events-none transition-[opacity] duration-500"
-      style="opacity: 0"
-      aria-hidden="true"
-    >
-      <span class="visitor-ping" />
-      <span class="visitor-ping visitor-ping--late" />
-      <span class="visitor-dot" />
-    </div>
-
     <template v-for="cluster in regionClusters" :key="cluster.code">
       <div
         :ref="bindClusterOverlayRef(cluster.code)"
@@ -569,11 +503,11 @@ function formatRate(bytesPerSec: number): string {
       class="absolute top-6 md:top-12 left-0 text-[10px] text-muted-foreground pointer-events-none flex gap-2 items-center backdrop-blur-lg bg-background/60 rounded px-2 py-0.5"
     >
       <div v-if="onlineServers > 0" class="flex items-center gap-1">
-        <span class="inline-block size-1.5 aspect-square shrink-0 rounded-full bg-green-600 animate-pulse" />
+        <span class="inline-block size-1.5 rounded-full bg-green-600 animate-pulse" />
         <span class="text-green-600">{{ onlineServers }}</span>
       </div>
       <div v-if="offlineServers > 0" class="flex items-center gap-1">
-        <span class="inline-block size-1.5 aspect-square shrink-0 rounded-full bg-yellow-600 animate-pulse" />
+        <span class="inline-block size-1.5 rounded-full bg-yellow-600 animate-pulse" />
         <span class="text-yellow-600">{{ offlineServers }}</span>
       </div>
       <!-- <div v-if="totalServers > 0" class="flex items-center gap-1">
@@ -587,51 +521,5 @@ function formatRate(bytesPerSec: number): string {
 <style scoped>
 .earth-globe-canvas {
   contain: layout paint;
-}
-
-.visitor-dot,
-.visitor-ping {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 9px;
-  height: 9px;
-  margin: -4.5px 0 0 -4.5px;
-  border-radius: 9999px;
-}
-
-.visitor-dot {
-  background: #16a34a;
-  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.9), 0 0 10px rgba(22, 163, 74, 0.45);
-  animation: visitor-dot-pulse 2s ease-in-out infinite;
-}
-
-.visitor-ping {
-  background: rgba(22, 163, 74, 0.45);
-  animation: visitor-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
-
-.visitor-ping--late {
-  animation-delay: 1s;
-}
-
-@keyframes visitor-dot-pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.25); }
-}
-
-@keyframes visitor-ping {
-  0% { transform: scale(1); opacity: 0.6; }
-  70%, 100% { transform: scale(3.2); opacity: 0; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .visitor-dot,
-  .visitor-ping {
-    animation: none;
-  }
-  .visitor-ping {
-    display: none;
-  }
 }
 </style>
