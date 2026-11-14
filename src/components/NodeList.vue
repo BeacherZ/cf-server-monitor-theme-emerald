@@ -86,6 +86,7 @@ const columns = computed<ColumnConfig[]>(() => [
   { key: 'status', label: '状态', width: '40px', sortable: true },
   { key: 'os', label: '系统', width: '40px', sortable: true },
   { key: 'name', label: '节点', width: 'minmax(150px, 0.5fr)', sortable: true },
+  { key: 'spacer', label: '', width: '24px', sortable: false },
   { key: 'tags', label: '标签', width: `${tagsColWidth.value}px`, sortable: false },
   { key: 'stack', label: 'IP', width: 'minmax(64px, 0.5fr)', sortable: false },
   { key: 'cpu', label: 'CPU', width: '100px', sortable: true },
@@ -424,6 +425,9 @@ function getRowTransitionStyle(index: number): Record<string, string> {
                   </span>
                 </div>
               </div>
+
+              <!-- 占位空列：让标签 / IP 及其后续列整体右移，不改变各列间距 -->
+              <div v-else-if="col.key === 'spacer'" />
             </template>
           </div>
 
