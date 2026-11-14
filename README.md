@@ -11,7 +11,7 @@
 ### 1. 探针后台要填的地址
 
 ```
-https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/c360005f393a952b6f33ef0f6ecf3f68fecab668
+https://github.com/BeacherZ/cf-server-monitor-theme-emerald/tree/a13d8283d2528b335d6cc55f99fbab2e03229368
 ```
 
 填写位置：CF Server Monitor 后台 → 设置 → 主题 → 「自定义主题 URL」→ 粘贴 → 预览 → 启用自定义 → 保存。
