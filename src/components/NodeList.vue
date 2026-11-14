@@ -85,10 +85,10 @@ watch(
 const columns = computed<ColumnConfig[]>(() => [
   { key: 'status', label: '状态', width: '40px', sortable: true },
   { key: 'os', label: '系统', width: '40px', sortable: true },
-  { key: 'name', label: '节点', width: 'minmax(150px, 0.5fr)', sortable: true },
+  { key: 'name', label: '节点', width: 'minmax(150px, 1fr)', sortable: true },
   { key: 'spacer', label: '', width: '24px', sortable: false },
   { key: 'tags', label: '标签', width: `${tagsColWidth.value}px`, sortable: false },
-  { key: 'stack', label: 'IP', width: 'minmax(64px, 0.5fr)', sortable: false },
+  { key: 'stack', label: 'IP', width: '94px', sortable: false },
   { key: 'cpu', label: 'CPU', width: '100px', sortable: true },
   { key: 'mem', label: '内存', width: '100px', sortable: true },
   { key: 'disk', label: '硬盘', width: '100px', sortable: true },
